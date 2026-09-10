@@ -1,0 +1,81 @@
+import 'package:flutter/material.dart';
+import '../calculators/home_loan/home_loan_screen.dart';
+import '../calculators/sip/sip_screen.dart';
+import '../calculators/emi/emi_screen.dart';
+import '../screens/splash_screen.dart';
+import '../screens/home_screen.dart';
+import '../screens/calculator_screen.dart';
+import '../screens/favorites_screen.dart';
+import '../screens/settings_screen.dart';
+import '../calculators/fd/fd_screen.dart';
+import '../calculators/rd/rd_screen.dart';
+import '../calculators/cagr/cagr_screen.dart';
+import '../calculators/lumpsum/lumpsum_screen.dart';
+import '../calculators/ppf/ppf_screen.dart';
+import '../calculators/swp/swp_screen.dart';
+import '../calculators/income_tax/income_tax_screen.dart';
+import '../calculators/inflation/inflation_screen.dart';
+import '../calculators/gold_loan/gold_loan_screen.dart';
+import '../calculators/personal_loan/personal_loan_screen.dart';
+import '../calculators/car_loan/car_loan_screen.dart';
+import '../calculators/gst/gst_screen.dart';
+import '../calculators/metal_prices/metal_prices_screen.dart';
+class AppRoutes {
+  // ------------------------------------------------------------
+  // ROUTES
+  // ------------------------------------------------------------
+
+  static const String home = '/';
+
+  static const String calculator = '/calculator';
+  static const String carLoan = '/car-loan';
+  static const String favorites = '/favorites';
+  static const String personalLoan = '/personal-loan';
+  static const String settings = '/settings';
+  static const String goldLoan = '/gold-loan';
+  static const String sip = '/sip';
+  static const String inflation = '/inflation';
+  static const String emi = '/emi';
+  static const String homeLoan = '/home-loan';
+  static const String fd = '/fd';
+  static const String splash = '/splash';
+  static const String rd = '/rd';
+  static const String cagr = '/cagr';
+  static const String lumpsum = '/lumpsum';
+  static const String ppf = '/ppf';
+  static const String swp = '/swp';
+  static const String incomeTax = '/income-tax';
+  static const String gst = '/gst';
+  static const String metalPrices = '/metal-prices';
+
+  // ------------------------------------------------------------
+  // ROUTE MAP
+  // ------------------------------------------------------------
+
+  static Map<String, WidgetBuilder> get routes {
+    return {
+      home: (context) => const HomeScreen(),
+
+      calculator: (context) => const CalculatorScreen(),
+      personalLoan: (context) => const PersonalLoanScreen(),
+      favorites: (context) => const FavoritesScreen(),
+      goldLoan: (context) => const GoldLoanScreen(),
+      settings: (context) => const SettingsScreen(),
+      splash: (context) => const SplashScreen(),
+      sip: (context) => const SipScreen(),
+      inflation: (context) => const InflationScreen(),
+      emi: (context) => const EmiScreen(),
+      homeLoan: (context) => const HomeLoanScreen(),
+      fd: (context) => const FdScreen(),
+      rd: (context) => const RdScreen(),
+      cagr: (context) => const CagrScreen(),
+      lumpsum: (context) => const LumpsumScreen(),
+      ppf: (context) => const PpfScreen(),
+      swp: (context) => const SwpScreen(),
+      incomeTax: (context) => const IncomeTaxScreen(),
+      carLoan: (context) => const CarLoanScreen(),
+      gst: (context) => const GstScreen(),
+      metalPrices: (context) => const MetalPricesScreen(),
+    };
+  }
+}

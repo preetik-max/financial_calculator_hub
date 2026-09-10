@@ -1,0 +1,43 @@
+import 'package:flutter/material.dart';
+
+class AppTheme {
+  static ThemeData lightTheme = ThemeData(
+    useMaterial3: true,
+    colorSchemeSeed: Colors.blue,
+    brightness: Brightness.light,
+
+    appBarTheme: const AppBarTheme(
+      centerTitle: true,
+    ),
+
+    inputDecorationTheme: const InputDecorationTheme(
+      border: OutlineInputBorder(),
+      filled: true,
+    ),
+
+    cardTheme: const CardThemeData(
+      elevation: 2,
+      margin: EdgeInsets.all(8),
+    ),
+  );
+
+  static ThemeData darkTheme = ThemeData(
+    useMaterial3: true,
+    colorSchemeSeed: Colors.blue,
+    brightness: Brightness.dark,
+
+    appBarTheme: const AppBarTheme(
+      centerTitle: true,
+    ),
+
+    inputDecorationTheme: const InputDecorationTheme(
+      border: OutlineInputBorder(),
+      filled: true,
+    ),
+
+    cardTheme: const CardThemeData(
+      elevation: 2,
+      margin: EdgeInsets.all(8),
+    ),
+  );
+}

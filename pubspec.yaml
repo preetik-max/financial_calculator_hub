@@ -1,0 +1,51 @@
+name: financial_calculator_hub
+
+description: "Financial Calculator Hub - SIP, EMI, FD, RD, CAGR and other financial calculators."
+
+publish_to: 'none'
+
+version: 1.0.1+2
+
+environment:
+  sdk: ^3.12.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # iOS-style icons
+  cupertino_icons: ^1.0.8
+
+  # Charts
+  fl_chart: ^1.1.1
+
+  # Google AdMob
+  google_mobile_ads: ^9.1.0
+
+  # Number, currency and date formatting
+  intl: ^0.20.2
+  http: ^1.6.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^6.0.0
+
+  # App launcher icons
+  flutter_launcher_icons: ^0.14.4
+
+flutter:
+  uses-material-design: true
+
+  # App assets
+  assets:
+    - assets/icon/app_icon.png
+
+# App launcher icon configuration
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/icon/app_icon.png"
+  adaptive_icon_background: "#0D47A1"
+  adaptive_icon_foreground: "assets/icon/app_icon.png"
