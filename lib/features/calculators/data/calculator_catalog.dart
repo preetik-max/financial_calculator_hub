@@ -1,13 +1,6 @@
 import 'package:flutter/material.dart';
 
-enum CalculatorCategory {
-  all,
-  investment,
-  loans,
-  savings,
-  tax,
-  tools,
-}
+enum CalculatorCategory { all, investment, loans, savings, tax, tools }
 
 class CalculatorItem {
   final String id;
@@ -40,7 +33,6 @@ class CalculatorCatalog {
     // ============================================================
     // INVESTMENT
     // ============================================================
-
     CalculatorItem(
       id: 'sip',
       title: 'SIP Calculator',
@@ -77,7 +69,6 @@ class CalculatorCatalog {
     // ============================================================
     // LOANS
     // ============================================================
-
     CalculatorItem(
       id: 'loan_eligibility',
       title: 'Loan Eligibility',
@@ -126,7 +117,6 @@ class CalculatorCatalog {
     // ============================================================
     // SAVINGS
     // ============================================================
-
     CalculatorItem(
       id: 'fd',
       title: 'FD Calculator',
@@ -163,7 +153,6 @@ class CalculatorCatalog {
     // ============================================================
     // TAX
     // ============================================================
-
     CalculatorItem(
       id: 'gst',
       title: 'GST Calculator',
@@ -184,10 +173,10 @@ class CalculatorCatalog {
       iconColor: Color(0xFF0891B2),
       backgroundColor: Color(0xFFE6F7FA),
     ),
+
     // ============================================================
     // TOOLS
     // ============================================================
-
     CalculatorItem(
       id: 'simple_interest',
       title: 'Simple Interest',
@@ -244,24 +233,18 @@ class CalculatorCatalog {
     ),
   ];
 
-  static List<CalculatorItem> byCategory(
-      CalculatorCategory category,
-      ) {
+  static List<CalculatorItem> byCategory(CalculatorCategory category) {
     if (category == CalculatorCategory.all) {
       return all;
     }
 
-    return all
-        .where(
-          (item) => item.categoryType == category,
-    )
-        .toList();
+    return all.where((item) => item.categoryType == category).toList();
   }
 
   static List<CalculatorItem> search(
-      String query,
-      CalculatorCategory category,
-      ) {
+    String query,
+    CalculatorCategory category,
+  ) {
     final normalized = query.trim().toLowerCase();
 
     return byCategory(category).where((item) {
@@ -269,15 +252,9 @@ class CalculatorCatalog {
         return true;
       }
 
-      return item.title
-          .toLowerCase()
-          .contains(normalized) ||
-          item.subtitle
-              .toLowerCase()
-              .contains(normalized) ||
-          item.category
-              .toLowerCase()
-              .contains(normalized);
+      return item.title.toLowerCase().contains(normalized) ||
+          item.subtitle.toLowerCase().contains(normalized) ||
+          item.category.toLowerCase().contains(normalized);
     }).toList();
   }
 }

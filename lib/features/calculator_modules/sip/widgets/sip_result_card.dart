@@ -10,10 +10,7 @@ import '../sip_model.dart';
 class SipResultCard extends StatelessWidget {
   final SipResult result;
 
-  const SipResultCard({
-    super.key,
-    required this.result,
-  });
+  const SipResultCard({super.key, required this.result});
 
   String _formatAmount(double amount) {
     if (amount >= 10000000) {
@@ -41,11 +38,9 @@ class SipResultCard extends StatelessWidget {
     final double returns = result.estimatedReturns;
     final double total = result.maturityValue;
 
-    final double investedPercentage =
-    total > 0 ? (invested / total) * 100 : 0;
+    final double investedPercentage = total > 0 ? (invested / total) * 100 : 0;
 
-    final double returnsPercentage =
-    total > 0 ? (returns / total) * 100 : 0;
+    final double returnsPercentage = total > 0 ? (returns / total) * 100 : 0;
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.lg),
@@ -57,10 +52,7 @@ class SipResultCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Your SIP Result',
-            style: AppTextStyles.sectionTitle,
-          ),
+          const Text('Your SIP Result', style: AppTextStyles.sectionTitle),
 
           const SizedBox(height: 6),
 
@@ -76,22 +68,15 @@ class SipResultCard extends StatelessWidget {
             padding: const EdgeInsets.all(AppSpacing.lg),
             decoration: BoxDecoration(
               gradient: const LinearGradient(
-                colors: [
-                  AppColors.primary,
-                  AppColors.primaryDark,
-                ],
+                colors: [AppColors.primary, AppColors.primaryDark],
               ),
-              borderRadius:
-              BorderRadius.circular(AppSpacing.radiusMd),
+              borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
             ),
             child: Column(
               children: [
                 const Text(
                   'Estimated Maturity Value',
-                  style: TextStyle(
-                    color: Colors.white70,
-                    fontSize: 13,
-                  ),
+                  style: TextStyle(color: Colors.white70, fontSize: 13),
                 ),
 
                 const SizedBox(height: 6),
@@ -109,10 +94,7 @@ class SipResultCard extends StatelessWidget {
 
                 Text(
                   _formatExact(total),
-                  style: const TextStyle(
-                    color: Colors.white70,
-                    fontSize: 12,
-                  ),
+                  style: const TextStyle(color: Colors.white70, fontSize: 12),
                 ),
               ],
             ),
@@ -120,10 +102,7 @@ class SipResultCard extends StatelessWidget {
 
           const SizedBox(height: AppSpacing.xl),
 
-          const Text(
-            'Investment Breakdown',
-            style: AppTextStyles.sectionTitle,
-          ),
+          const Text('Investment Breakdown', style: AppTextStyles.sectionTitle),
 
           const SizedBox(height: AppSpacing.md),
 
@@ -140,8 +119,7 @@ class SipResultCard extends StatelessWidget {
                       sections: [
                         PieChartSectionData(
                           value: invested > 0 ? invested : 1,
-                          title:
-                          '${investedPercentage.toStringAsFixed(0)}%',
+                          title: '${investedPercentage.toStringAsFixed(0)}%',
                           radius: 62,
                           titleStyle: const TextStyle(
                             color: Colors.white,
@@ -152,8 +130,7 @@ class SipResultCard extends StatelessWidget {
                         ),
                         PieChartSectionData(
                           value: returns > 0 ? returns : 1,
-                          title:
-                          '${returnsPercentage.toStringAsFixed(0)}%',
+                          title: '${returnsPercentage.toStringAsFixed(0)}%',
                           radius: 62,
                           titleStyle: const TextStyle(
                             color: Colors.white,
@@ -202,36 +179,20 @@ class SipResultCard extends StatelessWidget {
 
           const SizedBox(height: AppSpacing.md),
 
-          _row(
-            'Monthly SIP',
-            _formatExact(result.monthlyInvestment),
-          ),
+          _row('Monthly SIP', _formatExact(result.monthlyInvestment)),
 
           _row(
             'Expected Return',
             '${result.expectedReturn.toStringAsFixed(1)}% p.a.',
           ),
 
-          _row(
-            'Investment Period',
-            '${result.investmentYears} years',
-          ),
+          _row('Investment Period', '${result.investmentYears} years'),
 
-          _row(
-            'Total Investment',
-            _formatExact(invested),
-          ),
+          _row('Total Investment', _formatExact(invested)),
 
-          _row(
-            'Estimated Returns',
-            _formatExact(returns),
-          ),
+          _row('Estimated Returns', _formatExact(returns)),
 
-          _row(
-            'Maturity Value',
-            _formatExact(total),
-            highlighted: true,
-          ),
+          _row('Maturity Value', _formatExact(total), highlighted: true),
         ],
       ),
     );
@@ -250,10 +211,7 @@ class SipResultCard extends StatelessWidget {
           width: 12,
           height: 12,
           margin: const EdgeInsets.only(top: 3),
-          decoration: BoxDecoration(
-            color: color,
-            shape: BoxShape.circle,
-          ),
+          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
         ),
 
         const SizedBox(width: 8),
@@ -262,17 +220,11 @@ class SipResultCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                label,
-                style: AppTextStyles.caption,
-              ),
+              Text(label, style: AppTextStyles.caption),
 
               const SizedBox(height: 3),
 
-              Text(
-                _formatAmount(amount),
-                style: AppTextStyles.sectionTitle,
-              ),
+              Text(_formatAmount(amount), style: AppTextStyles.sectionTitle),
 
               const SizedBox(height: 2),
 
@@ -287,21 +239,12 @@ class SipResultCard extends StatelessWidget {
     );
   }
 
-  Widget _row(
-      String label,
-      String value, {
-        bool highlighted = false,
-      }) {
+  Widget _row(String label, String value, {bool highlighted = false}) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Row(
         children: [
-          Expanded(
-            child: Text(
-              label,
-              style: AppTextStyles.body,
-            ),
-          ),
+          Expanded(child: Text(label, style: AppTextStyles.body)),
 
           Text(
             value,

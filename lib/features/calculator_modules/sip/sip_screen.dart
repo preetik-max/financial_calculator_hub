@@ -17,24 +17,34 @@ class SipScreen extends StatefulWidget {
 }
 
 class _SipScreenState extends State<SipScreen> {
-  final TextEditingController _monthlyController =
-  TextEditingController(text: '5000');
+  final TextEditingController _monthlyController = TextEditingController(
+    text: '5000',
+  );
 
-  final TextEditingController _returnController =
-  TextEditingController(text: '12');
+  final TextEditingController _returnController = TextEditingController(
+    text: '12',
+  );
 
   int _years = 10;
 
   SipResult? _result;
 
-  String? _monthlyError;
-  String? _returnError;
-
   @override
   void initState() {
     super.initState();
 
-    _calculateSip();
+    // IMPORTANT:
+    // Do not call _calculateSip() directly from initState().
+    //
+    // _calculateSip() uses FocusScope.of(context), which depends on
+    // inherited widgets. The widget tree is not fully ready during initState.
+    //
+    // Run the initial calculation after the first frame.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+
+      _calculateSip(initialCalculation: true);
+    });
   }
 
   @override
@@ -46,35 +56,31 @@ class _SipScreenState extends State<SipScreen> {
   }
 
   double _parse(TextEditingController controller) {
-    return double.tryParse(
-      controller.text.replaceAll(',', '').trim(),
-    ) ??
-        0;
+    return double.tryParse(controller.text.replaceAll(',', '').trim()) ?? 0;
   }
 
-  void _calculateSip() {
-    FocusScope.of(context).unfocus();
+  void _calculateSip({bool initialCalculation = false}) {
+    // Only remove keyboard focus when the user explicitly
+    // presses Calculate.
+    //
+    // Do NOT do this during initState.
+    if (!initialCalculation && mounted) {
+      FocusScope.of(context).unfocus();
+    }
 
     final double monthly = _parse(_monthlyController);
+
     final double expectedReturn = _parse(_returnController);
 
-    String? monthlyError;
-    String? returnError;
+    // ------------------------------------------------------------
+    // Validation
+    // ------------------------------------------------------------
 
-    if (monthly <= 0) {
-      monthlyError = 'Enter a valid monthly SIP amount';
-    }
+    if (monthly < 500) {
+      if (!initialCalculation) {
+        _showMessage('Monthly SIP amount should be at least ₹500.');
+      }
 
-    if (expectedReturn < 0 || expectedReturn > 100) {
-      returnError = 'Return rate must be between 0% and 100%';
-    }
-
-    setState(() {
-      _monthlyError = monthlyError;
-      _returnError = returnError;
-    });
-
-    if (monthlyError != null || returnError != null) {
       setState(() {
         _result = null;
       });
@@ -82,26 +88,84 @@ class _SipScreenState extends State<SipScreen> {
       return;
     }
 
-    final input = SipInput(
+    if (monthly > 1000000) {
+      if (!initialCalculation) {
+        _showMessage('Monthly SIP amount cannot exceed ₹10,00,000.');
+      }
+
+      setState(() {
+        _result = null;
+      });
+
+      return;
+    }
+
+    if (expectedReturn < 0 || expectedReturn > 50) {
+      if (!initialCalculation) {
+        _showMessage('Expected return should be between 0% and 50%.');
+      }
+
+      setState(() {
+        _result = null;
+      });
+
+      return;
+    }
+
+    if (_years < 1 || _years > 40) {
+      if (!initialCalculation) {
+        _showMessage('Investment period should be between 1 and 40 years.');
+      }
+
+      setState(() {
+        _result = null;
+      });
+
+      return;
+    }
+
+    // ------------------------------------------------------------
+    // Calculate
+    // ------------------------------------------------------------
+
+    final SipInput input = SipInput(
       monthlyInvestment: monthly,
       expectedReturn: expectedReturn,
       investmentYears: _years,
     );
 
-    final result = SipCalculator.calculate(input);
+    final SipResult result = SipCalculator.calculate(input);
+
+    if (!mounted) return;
 
     setState(() {
       _result = result;
     });
   }
 
+  void _showMessage(String message) {
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(content: Text(message), behavior: SnackBarBehavior.floating),
+      );
+  }
+
+  String _formatInput(double value) {
+    if (value <= 0) {
+      return '0';
+    }
+
+    return value.toStringAsFixed(0);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('SIP Calculator'),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: const Text('SIP Calculator'), centerTitle: true),
+
       body: SafeArea(
         child: Column(
           children: [
@@ -109,6 +173,9 @@ class _SipScreenState extends State<SipScreen> {
               child: ListView(
                 padding: const EdgeInsets.all(AppSpacing.lg),
                 children: [
+                  // ========================================================
+                  // HEADER
+                  // ========================================================
                   const Text(
                     'Plan Your SIP Investment',
                     style: AppTextStyles.headline,
@@ -123,165 +190,199 @@ class _SipScreenState extends State<SipScreen> {
 
                   const SizedBox(height: AppSpacing.xl),
 
-                  _investmentCard(),
+                  // ========================================================
+                  // INPUT CARD
+                  // ========================================================
+                  Container(
+                    padding: const EdgeInsets.all(AppSpacing.lg),
+                    decoration: BoxDecoration(
+                      color: AppColors.surface,
+                      borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+                      border: Border.all(color: AppColors.border),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Investment Details',
+                          style: AppTextStyles.sectionTitle,
+                        ),
+
+                        const SizedBox(height: AppSpacing.lg),
+
+                        // ------------------------------------------------
+                        // Monthly SIP
+                        // ------------------------------------------------
+                        _inputField(
+                          controller: _monthlyController,
+                          label: 'Monthly SIP Amount',
+                          prefix: '₹ ',
+                          keyboardType: const TextInputType.numberWithOptions(
+                            decimal: true,
+                          ),
+                        ),
+
+                        const SizedBox(height: AppSpacing.md),
+
+                        // ------------------------------------------------
+                        // Expected Return
+                        // ------------------------------------------------
+                        _inputField(
+                          controller: _returnController,
+                          label: 'Expected Return Rate',
+                          suffix: ' % p.a.',
+                          keyboardType: const TextInputType.numberWithOptions(
+                            decimal: true,
+                          ),
+                        ),
+
+                        const SizedBox(height: AppSpacing.xl),
+
+                        // ------------------------------------------------
+                        // Investment Period
+                        // ------------------------------------------------
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              'Investment Period',
+                              style: AppTextStyles.body,
+                            ),
+                            Text(
+                              '$_years years',
+                              style: AppTextStyles.sectionTitle,
+                            ),
+                          ],
+                        ),
+
+                        const SizedBox(height: AppSpacing.sm),
+
+                        Slider(
+                          value: _years.toDouble(),
+                          min: 1,
+                          max: 40,
+                          divisions: 39,
+                          label: '$_years years',
+                          activeColor: AppColors.primary,
+                          onChanged: (value) {
+                            setState(() {
+                              _years = value.round();
+                            });
+                          },
+                        ),
+
+                        const Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text('1 year', style: AppTextStyles.caption),
+                            Text('40 years', style: AppTextStyles.caption),
+                          ],
+                        ),
+
+                        const SizedBox(height: AppSpacing.lg),
+
+                        // ------------------------------------------------
+                        // Calculate Button
+                        // ------------------------------------------------
+                        SizedBox(
+                          width: double.infinity,
+                          height: 52,
+                          child: ElevatedButton.icon(
+                            onPressed: () {
+                              _calculateSip(initialCalculation: false);
+                            },
+                            icon: const Icon(Icons.calculate_rounded),
+                            label: const Text(
+                              'Calculate SIP',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
 
                   const SizedBox(height: AppSpacing.xl),
 
-                  if (_result != null) ...[
-                    SipResultCard(result: _result!),
-                    const SizedBox(height: AppSpacing.xl),
-                  ],
+                  // ========================================================
+                  // RESULT
+                  // ========================================================
+                  if (_result != null) SipResultCard(result: _result!),
 
+                  if (_result != null) const SizedBox(height: AppSpacing.xl),
+
+                  // ========================================================
+                  // HOW IT WORKS
+                  // ========================================================
                   _infoCard(),
 
                   const SizedBox(height: AppSpacing.lg),
 
-                  const Text(
-                    'Disclaimer: SIP returns shown here are estimates for '
-                        'educational purposes only. Actual mutual fund returns '
-                        'are market-linked and may be higher or lower. This '
-                        'calculator does not constitute investment advice.',
-                    style: AppTextStyles.caption,
-                    textAlign: TextAlign.center,
+                  // ========================================================
+                  // DISCLAIMER
+                  // ========================================================
+                  Container(
+                    padding: const EdgeInsets.all(AppSpacing.md),
+                    decoration: BoxDecoration(
+                      color: AppColors.surface,
+                      borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                      border: Border.all(color: AppColors.border),
+                    ),
+                    child: const Text(
+                      'Disclaimer: SIP returns are market-linked and '
+                      'not guaranteed. This calculator provides an '
+                      'illustrative estimate based on the expected '
+                      'annual return entered by you.',
+                      style: AppTextStyles.caption,
+                    ),
                   ),
+
+                  const SizedBox(height: AppSpacing.xl),
+
+                  // ========================================================
+                  // BANNER AD
+                  // ========================================================
+                  const BannerAdWidget(),
 
                   const SizedBox(height: AppSpacing.lg),
                 ],
               ),
             ),
-
-            const BannerAdWidget(),
           ],
         ),
       ),
     );
   }
 
-  Widget _investmentCard() {
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.lg),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-        border: Border.all(color: AppColors.border),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Investment Details',
-            style: AppTextStyles.sectionTitle,
-          ),
-
-          const SizedBox(height: AppSpacing.lg),
-
-          TextField(
-            controller: _monthlyController,
-            keyboardType: const TextInputType.numberWithOptions(
-              decimal: true,
-            ),
-            onSubmitted: (_) => _calculateSip(),
-            decoration: InputDecoration(
-              labelText: 'Monthly SIP Amount',
-              prefixText: '₹ ',
-              errorText: _monthlyError,
-              filled: true,
-              fillColor: AppColors.background,
-              border: OutlineInputBorder(
-                borderRadius:
-                BorderRadius.circular(AppSpacing.radiusMd),
-              ),
-            ),
-          ),
-
-          const SizedBox(height: AppSpacing.md),
-
-          TextField(
-            controller: _returnController,
-            keyboardType: const TextInputType.numberWithOptions(
-              decimal: true,
-            ),
-            onSubmitted: (_) => _calculateSip(),
-            decoration: InputDecoration(
-              labelText: 'Expected Return Rate',
-              suffixText: '% p.a.',
-              errorText: _returnError,
-              filled: true,
-              fillColor: AppColors.background,
-              border: OutlineInputBorder(
-                borderRadius:
-                BorderRadius.circular(AppSpacing.radiusMd),
-              ),
-            ),
-          ),
-
-          const SizedBox(height: AppSpacing.xl),
-
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
-                'Investment Period',
-                style: AppTextStyles.body,
-              ),
-              Text(
-                '$_years years',
-                style: AppTextStyles.sectionTitle,
-              ),
-            ],
-          ),
-
-          Slider(
-            value: _years.toDouble(),
-            min: 1,
-            max: 40,
-            divisions: 39,
-            label: '$_years years',
-            activeColor: AppColors.primary,
-            onChanged: (value) {
-              setState(() {
-                _years = value.round();
-              });
-            },
-            onChangeEnd: (_) {
-              if (_result != null) {
-                _calculateSip();
-              }
-            },
-          ),
-
-          const Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                '1 year',
-                style: AppTextStyles.caption,
-              ),
-              Text(
-                '40 years',
-                style: AppTextStyles.caption,
-              ),
-            ],
-          ),
-
-          const SizedBox(height: AppSpacing.lg),
-
-          SizedBox(
-            width: double.infinity,
-            height: 52,
-            child: ElevatedButton.icon(
-              onPressed: _calculateSip,
-              icon: const Icon(Icons.calculate_rounded),
-              label: const Text(
-                'Calculate SIP',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ),
-          ),
-        ],
+  Widget _inputField({
+    required TextEditingController controller,
+    required String label,
+    String? prefix,
+    String? suffix,
+    TextInputType? keyboardType,
+  }) {
+    return TextField(
+      controller: controller,
+      keyboardType: keyboardType,
+      textInputAction: TextInputAction.done,
+      decoration: InputDecoration(
+        labelText: label,
+        prefixText: prefix,
+        suffixText: suffix,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+          borderSide: BorderSide(color: AppColors.border),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+          borderSide: BorderSide(color: AppColors.primary, width: 2),
+        ),
       ),
     );
   }
@@ -297,33 +398,22 @@ class _SipScreenState extends State<SipScreen> {
       child: const Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Text('How SIP Calculation Works', style: AppTextStyles.sectionTitle),
+
+          SizedBox(height: AppSpacing.md),
+
           Text(
-            'How SIP Calculation Works',
-            style: AppTextStyles.sectionTitle,
+            'The calculator estimates the future value of your '
+            'monthly SIP investment using the monthly equivalent '
+            'of the expected annual return.',
+            style: AppTextStyles.body,
           ),
 
           SizedBox(height: AppSpacing.md),
 
           Text(
-            'The calculator assumes a fixed monthly SIP investment '
-                'and a constant expected annual return rate.',
-            style: AppTextStyles.body,
-          ),
-
-          SizedBox(height: AppSpacing.sm),
-
-          Text(
-            'Each SIP contribution is treated as an end-of-month '
-                'investment so the result remains consistent with the '
-                'formula used in this calculator.',
-            style: AppTextStyles.caption,
-          ),
-
-          SizedBox(height: AppSpacing.sm),
-
-          Text(
-            'Actual mutual fund returns are market-linked and can '
-                'vary significantly over time.',
+            'Your actual mutual fund returns may be higher or lower '
+            'because market returns are not fixed.',
             style: AppTextStyles.caption,
           ),
         ],

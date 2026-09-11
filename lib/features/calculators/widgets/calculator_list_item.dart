@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_colors.dart';
@@ -23,28 +22,18 @@ class CalculatorListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(
-        bottom: AppSpacing.md,
-      ),
+      padding: const EdgeInsets.only(bottom: AppSpacing.md),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(
-            AppSpacing.radiusLg,
-          ),
+          borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
           onTap: onTap,
           child: Ink(
-            padding: const EdgeInsets.all(
-              AppSpacing.lg,
-            ),
+            padding: const EdgeInsets.all(AppSpacing.lg),
             decoration: BoxDecoration(
               color: AppColors.surface,
-              borderRadius: BorderRadius.circular(
-                AppSpacing.radiusLg,
-              ),
-              border: Border.all(
-                color: AppColors.border,
-              ),
+              borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+              border: Border.all(color: AppColors.border),
             ),
             child: Row(
               children: [
@@ -53,9 +42,7 @@ class CalculatorListItem extends StatelessWidget {
                   height: 56,
                   decoration: BoxDecoration(
                     color: calculator.backgroundColor,
-                    borderRadius: BorderRadius.circular(
-                      16,
-                    ),
+                    borderRadius: BorderRadius.circular(16),
                   ),
                   child: Icon(
                     calculator.icon,
@@ -64,19 +51,13 @@ class CalculatorListItem extends StatelessWidget {
                   ),
                 ),
 
-                const SizedBox(
-                  width: AppSpacing.lg,
-                ),
+                const SizedBox(width: AppSpacing.lg),
 
                 Expanded(
                   child: Column(
-                    crossAxisAlignment:
-                    CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        calculator.title,
-                        style: AppTextStyles.sectionTitle,
-                      ),
+                      Text(calculator.title, style: AppTextStyles.sectionTitle),
                       const SizedBox(height: 5),
                       Text(
                         calculator.subtitle,
@@ -88,20 +69,14 @@ class CalculatorListItem extends StatelessWidget {
                   ),
                 ),
 
-                const SizedBox(
-                  width: AppSpacing.sm,
-                ),
+                const SizedBox(width: AppSpacing.sm),
 
                 IconButton(
                   onPressed: onFavoriteTap,
                   tooltip: 'Favorite',
                   icon: Icon(
-                    isFavorite
-                        ? Icons.star_rounded
-                        : Icons.star_border_rounded,
-                    color: isFavorite
-                        ? AppColors.warning
-                        : AppColors.textMuted,
+                    isFavorite ? Icons.star_rounded : Icons.star_border_rounded,
+                    color: isFavorite ? AppColors.warning : AppColors.textMuted,
                   ),
                 ),
 

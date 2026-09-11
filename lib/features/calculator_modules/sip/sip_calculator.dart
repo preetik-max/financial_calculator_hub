@@ -5,16 +5,24 @@ import 'sip_model.dart';
 class SipCalculator {
   SipCalculator._();
 
-  /// Standard monthly SIP calculation.
+  /// Calculates SIP maturity value.
   ///
-  /// This implementation assumes the SIP contribution is made
-  /// at the END of each month.
+  /// Method:
   ///
-  /// FV = P × [((1 + r)^n - 1) / r]
+  /// 1. Convert annual return into an effective monthly rate:
+  ///
+  ///    monthlyRate = (1 + annualRate)^(1/12) - 1
+  ///
+  /// 2. Calculate future value of monthly SIP:
+  ///
+  ///    FV = P × [((1 + r)^n - 1) / r] × (1 + r)
   ///
   /// P = monthly SIP investment
-  /// r = monthly return rate
-  /// n = total number of months
+  /// r = effective monthly return
+  /// n = number of monthly investments
+  ///
+  /// The final (1 + r) assumes the SIP contribution occurs
+  /// at the beginning of each monthly period.
   static SipResult calculate(SipInput input) {
     final double monthlyInvestment = input.monthlyInvestment
         .clamp(0.0, 100000000.0)
@@ -42,20 +50,41 @@ class SipCalculator {
 
     final double investedAmount = monthlyInvestment * months;
 
-    final double monthlyRate = annualReturn / 100.0 / 12.0;
+    // ---------------------------------------------------------------
+    // Effective monthly return
+    // ---------------------------------------------------------------
+    //
+    // Do NOT use:
+    //
+    // annualReturn / 12
+    //
+    // because that treats the annual percentage as a nominal
+    // monthly rate.
+    //
+    // Instead:
+    //
+    // monthlyRate = (1 + annualRate)^(1/12) - 1
+    //
+    final double annualRateDecimal = annualReturn / 100.0;
+
+    final double monthlyRate =
+        math.pow(1.0 + annualRateDecimal, 1.0 / 12.0).toDouble() - 1.0;
 
     double maturityValue;
 
-    if (monthlyRate == 0) {
+    // ---------------------------------------------------------------
+    // Zero-return case
+    // ---------------------------------------------------------------
+
+    if (monthlyRate.abs() < 1e-12) {
       maturityValue = investedAmount;
     } else {
-      final double factor =
-      math.pow(1.0 + monthlyRate, months).toDouble();
+      final double factor = math.pow(1.0 + monthlyRate, months).toDouble();
 
-      // END-OF-MONTH SIP
       maturityValue =
           monthlyInvestment *
-              ((factor - 1.0) / monthlyRate);
+          ((factor - 1.0) / monthlyRate) *
+          (1.0 + monthlyRate);
     }
 
     final double estimatedReturns = math

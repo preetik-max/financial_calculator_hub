@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import '../../calculator_modules/lumpsum/lumpsum_screen.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_text_styles.dart';
@@ -322,6 +322,17 @@ class _CalculatorsScreenState extends State<CalculatorsScreen> {
         Navigator.push(
           context,
           MaterialPageRoute(builder: (_) => const SipScreen()),
+        );
+        return;
+
+      // ============================================================
+      // LUMPSUM CALCULATOR
+      // ============================================================
+
+      case 'lumpsum':
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => LumpsumScreen()),
         );
         return;
 

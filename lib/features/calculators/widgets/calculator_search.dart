@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_colors.dart';
@@ -29,11 +28,9 @@ class CalculatorSearch extends StatelessWidget {
         suffixIcon: controller.text.isEmpty
             ? null
             : IconButton(
-          onPressed: controller.clear,
-          icon: const Icon(
-            Icons.close_rounded,
-          ),
-        ),
+                onPressed: controller.clear,
+                icon: const Icon(Icons.close_rounded),
+              ),
         contentPadding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.lg,
           vertical: AppSpacing.lg,
