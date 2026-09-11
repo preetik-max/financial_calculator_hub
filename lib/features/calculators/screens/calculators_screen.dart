@@ -6,6 +6,7 @@ import '../../../core/theme/app_text_styles.dart';
 
 import '../../calculator_modules/loan_eligibility/loan_eligibility_screen.dart';
 import '../../calculator_modules/salary/salary_screen.dart';
+import '../../calculator_modules/sip/sip_screen.dart';
 
 import '../data/calculator_catalog.dart';
 import '../widgets/calculator_category_tabs.dart';
@@ -28,6 +29,10 @@ class _CalculatorsScreenState extends State<CalculatorsScreen> {
 
   final Set<String> _favorites = {};
 
+  // ================================================================
+  // LIFECYCLE
+  // ================================================================
+
   @override
   void dispose() {
     _searchController.dispose();
@@ -43,11 +48,12 @@ class _CalculatorsScreenState extends State<CalculatorsScreen> {
   }
 
   // ================================================================
-  // POPULAR SECTION VISIBILITY
+  // POPULAR SECTION
   // ================================================================
 
-  bool get _showingPopular =>
-      _searchQuery.isEmpty && _selectedCategory == CalculatorCategory.all;
+  bool get _showingPopular {
+    return _searchQuery.isEmpty && _selectedCategory == CalculatorCategory.all;
+  }
 
   // ================================================================
   // BUILD
@@ -88,7 +94,7 @@ class _CalculatorsScreenState extends State<CalculatorsScreen> {
                 controller: _searchController,
                 onChanged: (value) {
                   setState(() {
-                    _searchQuery = value;
+                    _searchQuery = value.trim();
                   });
                 },
               ),
@@ -189,55 +195,73 @@ class _CalculatorsScreenState extends State<CalculatorsScreen> {
   // ================================================================
 
   Widget _popularSection() {
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.lg),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [AppColors.primary, AppColors.primaryDark],
-        ),
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
         borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 50,
-            height: 50,
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.16),
-              borderRadius: BorderRadius.circular(15),
+        onTap: () {
+          _openPopularCalculator();
+        },
+        child: Ink(
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [AppColors.primary, AppColors.primaryDark],
             ),
-            child: const Icon(
-              Icons.calculate_rounded,
-              color: Colors.white,
-              size: 27,
-            ),
+            borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
           ),
-
-          const SizedBox(width: AppSpacing.md),
-
-          const Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Popular Calculators',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w800,
-                  ),
+          child: Row(
+            children: [
+              // --------------------------------------------------------
+              // ICON
+              // --------------------------------------------------------
+              Container(
+                width: 50,
+                height: 50,
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.16),
+                  borderRadius: BorderRadius.circular(15),
                 ),
-                SizedBox(height: 4),
-                Text(
-                  'SIP, EMI, Loan Eligibility and more',
-                  style: TextStyle(color: Colors.white70, fontSize: 12),
+                child: const Icon(
+                  Icons.calculate_rounded,
+                  color: Colors.white,
+                  size: 27,
                 ),
-              ],
-            ),
+              ),
+
+              const SizedBox(width: AppSpacing.md),
+
+              // --------------------------------------------------------
+              // TEXT
+              // --------------------------------------------------------
+              const Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Popular Calculators',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    SizedBox(height: 4),
+                    Text(
+                      'SIP, Salary, Loan Eligibility and more',
+                      style: TextStyle(color: Colors.white70, fontSize: 12),
+                    ),
+                  ],
+                ),
+              ),
+
+              // --------------------------------------------------------
+              // ARROW
+              // --------------------------------------------------------
+              const Icon(Icons.arrow_forward_rounded, color: Colors.white),
+            ],
           ),
-
-          const Icon(Icons.arrow_forward_rounded, color: Colors.white),
-        ],
+        ),
       ),
     );
   }
@@ -289,39 +313,74 @@ class _CalculatorsScreenState extends State<CalculatorsScreen> {
   // ================================================================
 
   void _openCalculator(BuildContext context, CalculatorItem calculator) {
-    // ==============================================================
-    // LOAN ELIGIBILITY
-    // ==============================================================
+    switch (calculator.id) {
+      // ============================================================
+      // SIP CALCULATOR
+      // ============================================================
 
-    if (calculator.id == 'loan_eligibility') {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (_) => const LoanEligibilityScreen()),
-      );
+      case 'sip':
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const SipScreen()),
+        );
+        return;
 
+      // ============================================================
+      // LOAN ELIGIBILITY
+      // ============================================================
+
+      case 'loan_eligibility':
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const LoanEligibilityScreen()),
+        );
+        return;
+
+      // ============================================================
+      // SALARY CALCULATOR
+      // ============================================================
+
+      case 'salary':
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const SalaryScreen()),
+        );
+        return;
+
+      // ============================================================
+      // FUTURE CALCULATORS
+      // ============================================================
+
+      default:
+        _showComingSoon(context, calculator.title);
+        return;
+    }
+  }
+
+  // ================================================================
+  // POPULAR CALCULATOR ACTION
+  // ================================================================
+
+  void _openPopularCalculator() {
+    final sipCalculator = CalculatorCatalog.all
+        .where((calculator) => calculator.id == 'sip')
+        .firstOrNull;
+
+    if (sipCalculator == null || !mounted) {
       return;
     }
 
-    // ==============================================================
-    // SALARY CALCULATOR
-    // ==============================================================
+    _openCalculator(context, sipCalculator);
+  }
 
-    if (calculator.id == 'salary') {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (_) => const SalaryScreen()),
-      );
+  // ================================================================
+  // COMING SOON
+  // ================================================================
 
-      return;
-    }
-
-    // ==============================================================
-    // OTHER CALCULATORS
-    // ==============================================================
-
+  void _showComingSoon(BuildContext context, String title) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('${calculator.title} will be available soon'),
+        content: Text('$title will be available soon.'),
         behavior: SnackBarBehavior.floating,
       ),
     );

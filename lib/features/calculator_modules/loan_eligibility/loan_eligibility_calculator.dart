@@ -5,120 +5,157 @@ import 'loan_eligibility_model.dart';
 class LoanEligibilityCalculator {
   LoanEligibilityCalculator._();
 
+  /// Calculates indicative loan eligibility.
+  ///
+  /// IMPORTANT:
+  /// This is an educational/planning estimate.
+  /// Actual lender eligibility may differ based on lender policy,
+  /// income verification, credit history, existing obligations,
+  /// property/vehicle value, age, employment profile and other factors.
   static List<LoanEligibilityResult> calculate(LoanEligibilityInput input) {
-    final double income = input.monthlyIncome.toDouble();
-    final double existingEmi = input.existingEmi.toDouble();
+    final double income = math.max(0.0, input.monthlyIncome);
+    final double existingEmi = math.max(0.0, input.existingEmi);
 
     if (income <= 0) {
       return [];
     }
 
-    // ---------------------------------------------------------------------------
-    // Indicative FOIR assumptions
-    // ---------------------------------------------------------------------------
-    //
-    // FOIR = Fixed Obligation to Income Ratio.
-    //
-    // This is an educational estimate only.
-    // Actual eligibility depends on the lender, income proof,
-    // credit history, obligations, property/vehicle, etc.
-    //
-    double foir;
+    final int creditScore = input.creditScore.clamp(300, 900);
+    final int age = input.age.clamp(18, 70);
 
-    if (input.creditScore >= 750) {
-      foir = 0.50;
-    } else if (input.creditScore >= 700) {
-      foir = 0.45;
-    } else if (input.creditScore >= 650) {
-      foir = 0.40;
-    } else {
-      foir = 0.35;
-    }
+    // ---------------------------------------------------------------------------
+    // 1. Determine indicative FOIR
+    // ---------------------------------------------------------------------------
+    //
+    // FOIR = Fixed Obligations to Income Ratio.
+    //
+    // The existing EMI is deducted from the maximum total EMI capacity.
+    //
+    double foir = _foirForCreditScore(creditScore);
 
+    // Self-employed profiles are given a slightly more conservative
+    // assumption because income can vary more significantly.
     if (input.employmentType == EmploymentType.selfEmployed) {
       foir -= 0.05;
     }
 
+    foir = foir.clamp(0.30, 0.50);
+
     final double maximumTotalEmi = income * foir;
 
-    final double availableEmi = math
-        .max(0.0, maximumTotalEmi - existingEmi)
-        .toDouble();
+    final double availableEmi = math.max(0.0, maximumTotalEmi - existingEmi);
 
     if (availableEmi <= 0) {
-      return [
-        const LoanEligibilityResult(
-          loanType: 'Personal Loan',
-          minimumAmount: 0,
-          maximumAmount: 0,
-          description: 'No additional EMI capacity based on the current inputs',
-        ),
-        const LoanEligibilityResult(
-          loanType: 'Home Loan',
-          minimumAmount: 0,
-          maximumAmount: 0,
-          description: 'No additional EMI capacity based on the current inputs',
-        ),
-        const LoanEligibilityResult(
-          loanType: 'Car Loan',
-          minimumAmount: 0,
-          maximumAmount: 0,
-          description: 'No additional EMI capacity based on the current inputs',
-        ),
-        const LoanEligibilityResult(
-          loanType: 'Education Loan',
-          minimumAmount: 0,
-          maximumAmount: 0,
-          description: 'No additional EMI capacity based on the current inputs',
-        ),
-      ];
+      return _noEligibilityResults();
     }
+
+    // ---------------------------------------------------------------------------
+    // 2. Credit-score factor
+    // ---------------------------------------------------------------------------
+    //
+    // Credit score affects the indicative amount conservatively.
+    // We do NOT increase the amount above the base EMI capacity.
+    //
+    final double creditFactor = _creditScoreFactor(creditScore);
+
+    // ---------------------------------------------------------------------------
+    // 3. Calculate each loan type
+    // ---------------------------------------------------------------------------
 
     return [
       _calculatePersonalLoan(
-        availableEmi,
-        input.tenureYears,
-        input.creditScore,
-        input.age,
+        availableEmi: availableEmi,
+        tenureYears: input.tenureYears,
+        creditFactor: creditFactor,
+        age: age,
       ),
-      _calculateHomeLoan(availableEmi, input.creditScore, input.age),
+      _calculateHomeLoan(
+        availableEmi: availableEmi,
+        creditFactor: creditFactor,
+        age: age,
+      ),
       _calculateCarLoan(
-        availableEmi,
-        input.tenureYears,
-        input.creditScore,
-        input.age,
+        availableEmi: availableEmi,
+        tenureYears: input.tenureYears,
+        creditFactor: creditFactor,
+        age: age,
       ),
-      _calculateEducationLoan(availableEmi, input.creditScore),
+      _calculateEducationLoan(
+        availableEmi: availableEmi,
+        creditFactor: creditFactor,
+      ),
     ];
+  }
+
+  // ---------------------------------------------------------------------------
+  // FOIR
+  // ---------------------------------------------------------------------------
+
+  static double _foirForCreditScore(int creditScore) {
+    if (creditScore >= 750) {
+      return 0.50;
+    }
+
+    if (creditScore >= 700) {
+      return 0.45;
+    }
+
+    if (creditScore >= 650) {
+      return 0.40;
+    }
+
+    return 0.35;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Credit score factor
+  // ---------------------------------------------------------------------------
+
+  static double _creditScoreFactor(int creditScore) {
+    if (creditScore >= 800) {
+      return 1.00;
+    }
+
+    if (creditScore >= 750) {
+      return 1.00;
+    }
+
+    if (creditScore >= 700) {
+      return 0.90;
+    }
+
+    if (creditScore >= 650) {
+      return 0.80;
+    }
+
+    return 0.65;
   }
 
   // ---------------------------------------------------------------------------
   // Personal Loan
   // ---------------------------------------------------------------------------
 
-  static LoanEligibilityResult _calculatePersonalLoan(
-    double availableEmi,
-    int tenureYears,
-    int creditScore,
-    int age,
-  ) {
+  static LoanEligibilityResult _calculatePersonalLoan({
+    required double availableEmi,
+    required int tenureYears,
+    required double creditFactor,
+    required int age,
+  }) {
     const double annualRate = 0.13;
 
     final int safeTenure = tenureYears.clamp(1, 7);
 
-    final double amount = _loanFromEmi(
-      availableEmi * 0.75,
-      annualRate,
-      safeTenure,
-    );
+    final double ageFactor = _ageFactor(age, maximumAge: 60);
 
-    final double adjusted = _adjustForProfile(amount, creditScore, age);
+    final double amount = _loanFromEmi(availableEmi, annualRate, safeTenure);
+
+    final double adjustedAmount = amount * creditFactor * ageFactor;
 
     return LoanEligibilityResult(
       loanType: 'Personal Loan',
-      minimumAmount: adjusted * 0.75,
-      maximumAmount: adjusted,
-      description: 'Estimated unsecured loan eligibility',
+      minimumAmount: _minimumRange(adjustedAmount, 0.80),
+      maximumAmount: adjustedAmount,
+      description: 'Indicative unsecured loan estimate based on EMI capacity',
     );
   }
 
@@ -126,27 +163,25 @@ class LoanEligibilityCalculator {
   // Home Loan
   // ---------------------------------------------------------------------------
 
-  static LoanEligibilityResult _calculateHomeLoan(
-    double availableEmi,
-    int creditScore,
-    int age,
-  ) {
+  static LoanEligibilityResult _calculateHomeLoan({
+    required double availableEmi,
+    required double creditFactor,
+    required int age,
+  }) {
     const double annualRate = 0.085;
     const int tenureYears = 20;
 
-    final double amount = _loanFromEmi(
-      availableEmi * 0.90,
-      annualRate,
-      tenureYears,
-    );
+    final double ageFactor = _ageFactor(age, maximumAge: 65);
 
-    final double adjusted = _adjustForProfile(amount, creditScore, age);
+    final double amount = _loanFromEmi(availableEmi, annualRate, tenureYears);
+
+    final double adjustedAmount = amount * creditFactor * ageFactor;
 
     return LoanEligibilityResult(
       loanType: 'Home Loan',
-      minimumAmount: adjusted * 0.80,
-      maximumAmount: adjusted,
-      description: 'Estimated home loan eligibility',
+      minimumAmount: _minimumRange(adjustedAmount, 0.85),
+      maximumAmount: adjustedAmount,
+      description: 'Indicative home loan estimate based on EMI capacity',
     );
   }
 
@@ -154,29 +189,27 @@ class LoanEligibilityCalculator {
   // Car Loan
   // ---------------------------------------------------------------------------
 
-  static LoanEligibilityResult _calculateCarLoan(
-    double availableEmi,
-    int tenureYears,
-    int creditScore,
-    int age,
-  ) {
+  static LoanEligibilityResult _calculateCarLoan({
+    required double availableEmi,
+    required int tenureYears,
+    required double creditFactor,
+    required int age,
+  }) {
     const double annualRate = 0.095;
 
     final int safeTenure = tenureYears.clamp(3, 7);
 
-    final double amount = _loanFromEmi(
-      availableEmi * 0.60,
-      annualRate,
-      safeTenure,
-    );
+    final double ageFactor = _ageFactor(age, maximumAge: 65);
 
-    final double adjusted = _adjustForProfile(amount, creditScore, age);
+    final double amount = _loanFromEmi(availableEmi, annualRate, safeTenure);
+
+    final double adjustedAmount = amount * creditFactor * ageFactor;
 
     return LoanEligibilityResult(
       loanType: 'Car Loan',
-      minimumAmount: adjusted * 0.80,
-      maximumAmount: adjusted,
-      description: 'Estimated vehicle loan eligibility',
+      minimumAmount: _minimumRange(adjustedAmount, 0.85),
+      maximumAmount: adjustedAmount,
+      description: 'Indicative vehicle loan estimate based on EMI capacity',
     );
   }
 
@@ -184,26 +217,34 @@ class LoanEligibilityCalculator {
   // Education Loan
   // ---------------------------------------------------------------------------
 
-  static LoanEligibilityResult _calculateEducationLoan(
-    double availableEmi,
-    int creditScore,
-  ) {
-    final double incomeBasedAmount = availableEmi * 60.0;
+  static LoanEligibilityResult _calculateEducationLoan({
+    required double availableEmi,
+    required double creditFactor,
+  }) {
+    // Education loans are highly dependent on course, institution,
+    // collateral and lender policy. Therefore this is intentionally capped.
+    const double annualRate = 0.095;
+    const int tenureYears = 10;
+    const double maximumAmount = 1000000.0;
 
-    final double amount = math.min(incomeBasedAmount, 1000000.0).toDouble();
+    final double amount = _loanFromEmi(availableEmi, annualRate, tenureYears);
 
-    final double adjusted = _adjustForCreditScore(amount, creditScore);
+    final double adjustedAmount = math.min(
+      amount * creditFactor,
+      maximumAmount,
+    );
 
     return LoanEligibilityResult(
       loanType: 'Education Loan',
-      minimumAmount: adjusted * 0.70,
-      maximumAmount: adjusted,
-      description: 'Indicative education loan estimate',
+      minimumAmount: _minimumRange(adjustedAmount, 0.75),
+      maximumAmount: adjustedAmount,
+      description:
+          'Indicative education loan estimate; actual limits vary by lender',
     );
   }
 
   // ---------------------------------------------------------------------------
-  // EMI -> Loan Amount
+  // EMI -> Principal
   // ---------------------------------------------------------------------------
 
   static double _loanFromEmi(double emi, double annualRate, int years) {
@@ -224,57 +265,70 @@ class LoanEligibilityCalculator {
   }
 
   // ---------------------------------------------------------------------------
-  // Profile adjustment
+  // Age factor
   // ---------------------------------------------------------------------------
 
-  static double _adjustForProfile(double amount, int creditScore, int age) {
-    double multiplier = 1.0;
-
-    if (creditScore >= 800) {
-      multiplier = 1.05;
-    } else if (creditScore >= 750) {
-      multiplier = 1.00;
-    } else if (creditScore >= 700) {
-      multiplier = 0.90;
-    } else if (creditScore >= 650) {
-      multiplier = 0.75;
-    } else {
-      multiplier = 0.50;
+  static double _ageFactor(int age, {required int maximumAge}) {
+    if (age < 21) {
+      return 0.85;
     }
 
-    // Indicative age adjustment.
-    if (age < 23) {
-      multiplier *= 0.85;
-    } else if (age > 55) {
-      multiplier *= 0.85;
-    } else if (age > 50) {
-      multiplier *= 0.92;
+    if (age > maximumAge) {
+      return 0.75;
     }
 
-    return amount * multiplier;
+    if (age > 55) {
+      return 0.90;
+    }
+
+    if (age > 50) {
+      return 0.95;
+    }
+
+    return 1.00;
   }
 
   // ---------------------------------------------------------------------------
-  // Credit score adjustment
+  // Result range
   // ---------------------------------------------------------------------------
 
-  static double _adjustForCreditScore(double amount, int creditScore) {
-    if (creditScore >= 800) {
-      return amount * 1.05;
-    }
+  static double _minimumRange(double amount, double factor) {
+    return math.max(0.0, amount * factor);
+  }
 
-    if (creditScore >= 750) {
-      return amount;
-    }
+  // ---------------------------------------------------------------------------
+  // No eligibility
+  // ---------------------------------------------------------------------------
 
-    if (creditScore >= 700) {
-      return amount * 0.90;
-    }
+  static List<LoanEligibilityResult> _noEligibilityResults() {
+    const String message =
+        'No additional EMI capacity based on the current inputs';
 
-    if (creditScore >= 650) {
-      return amount * 0.75;
-    }
-
-    return amount * 0.50;
+    return const [
+      LoanEligibilityResult(
+        loanType: 'Personal Loan',
+        minimumAmount: 0,
+        maximumAmount: 0,
+        description: message,
+      ),
+      LoanEligibilityResult(
+        loanType: 'Home Loan',
+        minimumAmount: 0,
+        maximumAmount: 0,
+        description: message,
+      ),
+      LoanEligibilityResult(
+        loanType: 'Car Loan',
+        minimumAmount: 0,
+        maximumAmount: 0,
+        description: message,
+      ),
+      LoanEligibilityResult(
+        loanType: 'Education Loan',
+        minimumAmount: 0,
+        maximumAmount: 0,
+        description: message,
+      ),
+    ];
   }
 }
