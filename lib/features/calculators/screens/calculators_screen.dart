@@ -3,15 +3,19 @@ import '../../calculator_modules/lumpsum/lumpsum_screen.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_text_styles.dart';
-
+import '../../calculator_modules/cagr/cagr_screen.dart';
 import '../../calculator_modules/loan_eligibility/loan_eligibility_screen.dart';
 import '../../calculator_modules/salary/salary_screen.dart';
 import '../../calculator_modules/sip/sip_screen.dart';
-
+import '../../calculator_modules/emi/emi_screen.dart';
 import '../data/calculator_catalog.dart';
 import '../widgets/calculator_category_tabs.dart';
 import '../widgets/calculator_list_item.dart';
 import '../widgets/calculator_search.dart';
+import '../../calculator_modules/home_loan/home_loan_screen.dart';
+import '../../calculator_modules/fd/fd_screen.dart';
+import '../../calculator_modules/rd/rd_screen.dart';
+import '../../calculator_modules/ppf/ppf_screen.dart';
 
 class CalculatorsScreen extends StatefulWidget {
   const CalculatorsScreen({super.key});
@@ -329,6 +333,13 @@ class _CalculatorsScreenState extends State<CalculatorsScreen> {
       // LUMPSUM CALCULATOR
       // ============================================================
 
+      case 'cagr':
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const CagrScreen()),
+        );
+        break;
+
       case 'lumpsum':
         Navigator.push(
           context,
@@ -346,6 +357,38 @@ class _CalculatorsScreenState extends State<CalculatorsScreen> {
           MaterialPageRoute(builder: (_) => const LoanEligibilityScreen()),
         );
         return;
+      case 'fd':
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const FdScreen()),
+        );
+        break;
+      case 'home_loan':
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const HomeLoanScreen()),
+        );
+        break;
+
+      case 'emi':
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const EmiScreen()),
+        );
+        break;
+      case 'rd':
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const RdScreen()),
+        );
+        break;
+
+      case 'ppf':
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const PpfScreen()),
+        );
+        break;
 
       // ============================================================
       // SALARY CALCULATOR

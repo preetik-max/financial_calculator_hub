@@ -1,7 +1,4 @@
-enum EmploymentType {
-  salaried,
-  selfEmployed,
-}
+enum EmploymentType { salaried, selfEmployed }
 
 class LoanEligibilityInput {
   final double monthlyIncome;

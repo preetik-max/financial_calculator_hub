@@ -1,0 +1,48 @@
+class HomeLoanInput {
+  final double loanAmount;
+  final double annualInterestRate;
+  final int tenureYears;
+
+  const HomeLoanInput({
+    required this.loanAmount,
+    required this.annualInterestRate,
+    required this.tenureYears,
+  });
+}
+
+class HomeLoanResult {
+  final double loanAmount;
+  final double annualInterestRate;
+  final int tenureYears;
+  final int tenureMonths;
+
+  final double monthlyEmi;
+  final double totalInterest;
+  final double totalPayment;
+
+  const HomeLoanResult({
+    required this.loanAmount,
+    required this.annualInterestRate,
+    required this.tenureYears,
+    required this.tenureMonths,
+    required this.monthlyEmi,
+    required this.totalInterest,
+    required this.totalPayment,
+  });
+
+  double get principalPercentage {
+    if (totalPayment <= 0) {
+      return 0;
+    }
+
+    return (loanAmount / totalPayment) * 100;
+  }
+
+  double get interestPercentage {
+    if (totalPayment <= 0) {
+      return 0;
+    }
+
+    return (totalInterest / totalPayment) * 100;
+  }
+}
