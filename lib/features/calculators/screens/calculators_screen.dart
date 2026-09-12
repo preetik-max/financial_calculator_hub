@@ -8,6 +8,7 @@ import '../../calculator_modules/loan_eligibility/loan_eligibility_screen.dart';
 import '../../calculator_modules/salary/salary_screen.dart';
 import '../../calculator_modules/sip/sip_screen.dart';
 import '../../calculator_modules/emi/emi_screen.dart';
+import '../../calculator_modules/inflation/inflation_screen.dart';
 import '../data/calculator_catalog.dart';
 import '../widgets/calculator_category_tabs.dart';
 import '../widgets/calculator_list_item.dart';
@@ -16,6 +17,9 @@ import '../../calculator_modules/home_loan/home_loan_screen.dart';
 import '../../calculator_modules/fd/fd_screen.dart';
 import '../../calculator_modules/rd/rd_screen.dart';
 import '../../calculator_modules/ppf/ppf_screen.dart';
+import '../../calculator_modules/gst/gst_screen.dart';
+import '../../calculator_modules/compound_interest/compound_interest_screen.dart';
+import '../../calculator_modules/simple_interest/simple_interest_screen.dart';
 
 class CalculatorsScreen extends StatefulWidget {
   const CalculatorsScreen({super.key});
@@ -340,12 +344,40 @@ class _CalculatorsScreenState extends State<CalculatorsScreen> {
         );
         break;
 
+      case 'simple_interest':
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const SimpleInterestScreen()),
+        );
+        break;
+
       case 'lumpsum':
         Navigator.push(
           context,
           MaterialPageRoute(builder: (_) => LumpsumScreen()),
         );
         return;
+
+      case 'gst':
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const GstScreen()),
+        );
+        break;
+
+      case 'compound_interest':
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const CompoundInterestScreen()),
+        );
+        break;
+
+      case 'inflation':
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const InflationScreen()),
+        );
+        break;
 
       // ============================================================
       // LOAN ELIGIBILITY
