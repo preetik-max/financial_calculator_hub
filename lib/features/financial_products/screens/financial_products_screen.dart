@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/ads/banner_ad_widget.dart';
+import '../../../core/lead/lead_contact_button.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_text_styles.dart';
@@ -11,160 +13,211 @@ class FinancialProductsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Financial Products')),
+
+      // Centralized WhatsApp lead button.
+      floatingActionButton: LeadContactButton(
+        message: '''
+Hello, I need help choosing a financial product.
+
+I am using the Finora Financial Calculator app.
+
+I would like guidance about suitable financial products.
+
+Please contact me.
+
+Thank you.
+''',
+        tooltip: 'Chat with Financial Advisor',
+        onError: () {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Unable to open WhatsApp. Please try again.'),
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        },
+      ),
+
       body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.all(AppSpacing.lg),
-          children: [
-            _heroCard(),
+        child: CustomScrollView(
+          physics: const BouncingScrollPhysics(),
+          slivers: [
+            SliverPadding(
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              sliver: SliverToBoxAdapter(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Choose a financial product',
+                      style: AppTextStyles.title,
+                    ),
 
-            const SizedBox(height: AppSpacing.xl),
+                    const SizedBox(height: 6),
 
-            const Text(
-              'Explore Financial Products',
-              style: AppTextStyles.sectionTitle,
+                    Text(
+                      'Explore financial products and '
+                      'connect with providers.',
+                      style: AppTextStyles.body,
+                    ),
+
+                    const SizedBox(height: AppSpacing.lg),
+
+                    _ProductCard(
+                      icon: Icons.account_balance_rounded,
+                      title: 'Demat Accounts',
+                      description: 'Explore demat and trading account options.',
+                      buttonText: 'View Offers',
+                      onTap: () {
+                        _showComingSoon(context, 'Demat Account offers');
+                      },
+                    ),
+
+                    const SizedBox(height: AppSpacing.md),
+
+                    _ProductCard(
+                      icon: Icons.credit_card_rounded,
+                      title: 'Credit Cards',
+                      description: 'Compare credit card options and benefits.',
+                      buttonText: 'View Offers',
+                      onTap: () {
+                        _showComingSoon(context, 'Credit Card offers');
+                      },
+                    ),
+
+                    const SizedBox(height: AppSpacing.md),
+
+                    _ProductCard(
+                      icon: Icons.currency_rupee_rounded,
+                      title: 'Personal Loans',
+                      description:
+                          'Explore personal loan options from providers.',
+                      buttonText: 'View Offers',
+                      onTap: () {
+                        _showComingSoon(context, 'Personal Loan offers');
+                      },
+                    ),
+
+                    const SizedBox(height: AppSpacing.md),
+
+                    _ProductCard(
+                      icon: Icons.home_work_rounded,
+                      title: 'Home Loans',
+                      description: 'Explore home loan options and financing.',
+                      buttonText: 'View Offers',
+                      onTap: () {
+                        _showComingSoon(context, 'Home Loan offers');
+                      },
+                    ),
+
+                    const SizedBox(height: AppSpacing.md),
+
+                    _ProductCard(
+                      icon: Icons.shield_outlined,
+                      title: 'Insurance',
+                      description: 'Explore insurance products from providers.',
+                      buttonText: 'View Offers',
+                      onTap: () {
+                        _showComingSoon(context, 'Insurance offers');
+                      },
+                    ),
+
+                    const SizedBox(height: AppSpacing.md),
+
+                    _ProductCard(
+                      icon: Icons.account_balance_outlined,
+                      title: 'Fixed Deposits',
+                      description: 'Explore fixed deposit options.',
+                      buttonText: 'View Offers',
+                      onTap: () {
+                        _showComingSoon(context, 'Fixed Deposit offers');
+                      },
+                    ),
+
+                    const SizedBox(height: AppSpacing.md),
+
+                    _ProductCard(
+                      icon: Icons.trending_up_rounded,
+                      title: 'Investments',
+                      description:
+                          'Explore investment and mutual fund options.',
+                      buttonText: 'View Offers',
+                      onTap: () {
+                        _showComingSoon(context, 'Investment offers');
+                      },
+                    ),
+
+                    const SizedBox(height: AppSpacing.xl),
+
+                    // Centralized AdMob.
+                    const Center(child: BannerAdWidget()),
+
+                    const SizedBox(height: AppSpacing.xl),
+                  ],
+                ),
+              ),
             ),
-
-            const SizedBox(height: AppSpacing.md),
-
-            _productCard(
-              context,
-              icon: Icons.credit_card_rounded,
-              iconColor: const Color(0xFF7C3AED),
-              backgroundColor: const Color(0xFFF3E8FF),
-              title: 'Credit Cards',
-              subtitle: 'Compare credit cards and offers',
-            ),
-
-            _productCard(
-              context,
-              icon: Icons.payments_rounded,
-              iconColor: AppColors.primary,
-              backgroundColor: const Color(0xFFE8F0FF),
-              title: 'Personal Loan',
-              subtitle: 'Explore personal loan options',
-            ),
-
-            _productCard(
-              context,
-              icon: Icons.home_rounded,
-              iconColor: const Color(0xFFEA580C),
-              backgroundColor: const Color(0xFFFFEDE5),
-              title: 'Home Loan',
-              subtitle: 'Explore home loan offers',
-            ),
-
-            _productCard(
-              context,
-              icon: Icons.show_chart_rounded,
-              iconColor: AppColors.positive,
-              backgroundColor: const Color(0xFFE8F8EF),
-              title: 'Demat Account',
-              subtitle: 'Open a demat and trading account',
-            ),
-
-            _productCard(
-              context,
-              icon: Icons.shield_outlined,
-              iconColor: const Color(0xFF0891B2),
-              backgroundColor: const Color(0xFFE6F7FA),
-              title: 'Insurance',
-              subtitle: 'Explore insurance products',
-            ),
-
-            _productCard(
-              context,
-              icon: Icons.account_balance_rounded,
-              iconColor: AppColors.gold,
-              backgroundColor: AppColors.goldLight,
-              title: 'Investment Accounts',
-              subtitle: 'Explore investment opportunities',
-            ),
-
-            const SizedBox(height: AppSpacing.xl),
-
-            _disclosure(),
           ],
         ),
       ),
     );
   }
 
-  Widget _heroCard() {
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.xl),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [AppColors.primary, AppColors.primaryDark],
+  void _showComingSoon(BuildContext context, String product) {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text('$product will be available soon'),
+          behavior: SnackBarBehavior.floating,
         ),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-      ),
-      child: const Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(
-            Icons.account_balance_wallet_rounded,
-            color: Colors.white,
-            size: 40,
-          ),
-
-          SizedBox(height: 14),
-
-          Text(
-            'Financial Products',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 22,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-
-          SizedBox(height: 7),
-
-          Text(
-            'Compare and explore financial products '
-            'from our partners.',
-            style: TextStyle(color: Colors.white70, fontSize: 13, height: 1.5),
-          ),
-        ],
-      ),
-    );
+      );
   }
+}
 
-  Widget _productCard(
-    BuildContext context, {
-    required IconData icon,
-    required Color iconColor,
-    required Color backgroundColor,
-    required String title,
-    required String subtitle,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: AppSpacing.md),
+class _ProductCard extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String description;
+  final String buttonText;
+  final VoidCallback onTap;
+
+  const _ProductCard({
+    required this.icon,
+    required this.title,
+    required this.description,
+    required this.buttonText,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: AppColors.surface,
+      borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
       child: InkWell(
         borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-        onTap: () {
-          _comingSoon(context, title);
-        },
+        onTap: onTap,
         child: Container(
           padding: const EdgeInsets.all(AppSpacing.lg),
           decoration: BoxDecoration(
-            color: AppColors.surface,
             borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
             border: Border.all(color: AppColors.border),
           ),
           child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                width: 58,
-                height: 58,
+                width: 52,
+                height: 52,
                 decoration: BoxDecoration(
-                  color: backgroundColor,
-                  borderRadius: BorderRadius.circular(17),
+                  color: const Color(0xFFE8F0FF),
+                  borderRadius: BorderRadius.circular(15),
                 ),
-                child: Icon(icon, color: iconColor, size: 29),
+                child: Icon(icon, color: AppColors.primary, size: 27),
               ),
 
-              const SizedBox(width: AppSpacing.lg),
+              const SizedBox(width: AppSpacing.md),
 
               Expanded(
                 child: Column(
@@ -174,45 +227,17 @@ class FinancialProductsScreen extends StatelessWidget {
 
                     const SizedBox(height: 5),
 
-                    Text(subtitle, style: AppTextStyles.caption),
+                    Text(description, style: AppTextStyles.body),
+
+                    const SizedBox(height: AppSpacing.md),
+
+                    OutlinedButton(onPressed: onTap, child: Text(buttonText)),
                   ],
                 ),
-              ),
-
-              const Icon(
-                Icons.chevron_right_rounded,
-                color: AppColors.textSecondary,
               ),
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _disclosure() {
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.lg),
-      decoration: BoxDecoration(
-        color: AppColors.silverLight,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-      ),
-      child: Text(
-        'Affiliate Disclosure\n\n'
-        'Some links may be affiliate links. '
-        'We may earn a commission when you use '
-        'certain partner services through our app. '
-        'This does not affect the price you pay.',
-        style: AppTextStyles.caption.copyWith(height: 1.5),
-      ),
-    );
-  }
-
-  void _comingSoon(BuildContext context, String product) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('$product offers coming soon'),
-        behavior: SnackBarBehavior.floating,
       ),
     );
   }

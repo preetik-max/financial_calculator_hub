@@ -20,6 +20,9 @@ import '../../calculator_modules/ppf/ppf_screen.dart';
 import '../../calculator_modules/gst/gst_screen.dart';
 import '../../calculator_modules/compound_interest/compound_interest_screen.dart';
 import '../../calculator_modules/simple_interest/simple_interest_screen.dart';
+import '../../calculator_modules/percentage/percentage_screen.dart';
+import '../../calculator_modules/discount/discount_screen.dart';
+import '../../calculator_modules/age/age_screen.dart';
 
 class CalculatorsScreen extends StatefulWidget {
   const CalculatorsScreen({super.key});
@@ -379,6 +382,20 @@ class _CalculatorsScreenState extends State<CalculatorsScreen> {
         );
         break;
 
+      case 'percentage':
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const PercentageScreen()),
+        );
+        break;
+
+      case 'discount':
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const DiscountScreen()),
+        );
+        break;
+
       // ============================================================
       // LOAN ELIGIBILITY
       // ============================================================
@@ -421,6 +438,17 @@ class _CalculatorsScreenState extends State<CalculatorsScreen> {
           MaterialPageRoute(builder: (_) => const PpfScreen()),
         );
         break;
+
+      // ============================================================
+      // AGE CALCULATOR
+      // ============================================================
+
+      case 'age':
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const AgeScreen()),
+        );
+        return;
 
       // ============================================================
       // SALARY CALCULATOR

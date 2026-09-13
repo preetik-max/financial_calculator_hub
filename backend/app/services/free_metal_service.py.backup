@@ -1,0 +1,250 @@
+import asyncio
+import time
+
+import httpx
+
+
+# XAUS public API
+# No API key / token required.
+API_URL = (
+    "https://xaus.com/api/v1/spot"
+    "?currency=INR"
+    "&unit=gram"
+    "&compact=1"
+)
+
+TROY_OUNCE_GRAMS = 31.1034768
+
+# Cache locally so every Flutter request does not call the external API.
+CACHE_SECONDS = 60
+
+_cache_data = None
+_cache_time: float = 0.0
+
+_cache_lock = asyncio.Lock()
+
+
+def _round(value: float, digits: int = 2) -> float:
+    return round(float(value), digits)
+
+
+async def _fetch_from_provider() -> dict:
+    async with httpx.AsyncClient(timeout=15.0) as client:
+        response = await client.get(API_URL)
+        response.raise_for_status()
+
+        return response.json()
+
+
+async def get_latest_metal_rates() -> dict:
+    global _cache_data
+    global _cache_time
+
+    now = time.monotonic()
+
+    # ---------------------------------------------------------
+    # CACHE
+    # ---------------------------------------------------------
+
+    if _cache_data is not None:
+        cache_age = now - _cache_time
+
+        if cache_age < CACHE_SECONDS:
+            return _cache_data
+
+    # Prevent multiple simultaneous requests from hitting XAUS.
+    async with _cache_lock:
+
+        now = time.monotonic()
+
+        if _cache_data is not None:
+            cache_age = now - _cache_time
+
+            if cache_age < CACHE_SECONDS:
+                return _cache_data
+
+        # -----------------------------------------------------
+        # FETCH LIVE DATA
+        # -----------------------------------------------------
+
+        data = await _fetch_from_provider()
+
+        # -----------------------------------------------------
+        # SOURCE DATA
+        # -----------------------------------------------------
+
+        gold_gram_inr = float(data["xau"]["price"])
+
+        silver_usd_oz = float(data["silver_usd_oz"])
+        fx_rate = float(data["fx_rate"])
+
+        silver_oz_inr = silver_usd_oz * fx_rate
+
+        silver_gram_inr = (
+            silver_oz_inr / TROY_OUNCE_GRAMS
+        )
+
+        # -----------------------------------------------------
+        # GOLD PURITY
+        #
+        # 24K = 100%
+        # 22K = 22/24
+        # 18K = 18/24
+        # -----------------------------------------------------
+
+        gold_24k = gold_gram_inr
+        gold_22k = gold_gram_inr * (22 / 24)
+        gold_18k = gold_gram_inr * (18 / 24)
+
+        # -----------------------------------------------------
+        # SILVER 999
+        #
+        # Indicative 99.9% purity reference.
+        # -----------------------------------------------------
+
+        silver_999 = silver_gram_inr * 0.999
+
+        # -----------------------------------------------------
+        # RESPONSE
+        # -----------------------------------------------------
+
+        result = {
+            "source": data.get(
+                "source",
+                "xaus.com",
+            ),
+
+            "price_source": data.get(
+                "price_source",
+                "xaus.com",
+            ),
+
+            "currency": "INR",
+
+            "updated_at": data.get("updated_at"),
+
+            "price_as_of": data.get("price_as_of"),
+
+            "data_state": data.get(
+                "data_state",
+                {},
+            ),
+
+            # -------------------------------------------------
+            # GOLD
+            # -------------------------------------------------
+
+            "gold": {
+                # Pure spot reference
+                "spot_per_gram": _round(
+                    gold_gram_inr
+                ),
+
+                "spot_per_10g": _round(
+                    gold_gram_inr * 10
+                ),
+
+                "spot_per_kg": _round(
+                    gold_gram_inr * 1000
+                ),
+
+                "spot_per_troy_oz": _round(
+                    silver_oz_inr
+                    if False
+                    else gold_gram_inr
+                    * TROY_OUNCE_GRAMS
+                ),
+
+                # Indian purity references
+                "purity": {
+                    "24k": {
+                        "karat": 24,
+                        "fineness": 999,
+                        "per_gram": _round(
+                            gold_24k
+                        ),
+                        "per_10g": _round(
+                            gold_24k * 10
+                        ),
+                    },
+
+                    "22k": {
+                        "karat": 22,
+                        "fineness": 916,
+                        "per_gram": _round(
+                            gold_22k
+                        ),
+                        "per_10g": _round(
+                            gold_22k * 10
+                        ),
+                    },
+
+                    "18k": {
+                        "karat": 18,
+                        "fineness": 750,
+                        "per_gram": _round(
+                            gold_18k
+                        ),
+                        "per_10g": _round(
+                            gold_18k * 10
+                        ),
+                    },
+                },
+            },
+
+            # -------------------------------------------------
+            # SILVER
+            # -------------------------------------------------
+
+            "silver": {
+                "spot_per_gram": _round(
+                    silver_gram_inr
+                ),
+
+                "spot_per_10g": _round(
+                    silver_gram_inr * 10
+                ),
+
+                "spot_per_kg": _round(
+                    silver_gram_inr * 1000
+                ),
+
+                "spot_per_troy_oz": _round(
+                    silver_oz_inr
+                ),
+
+                "purity": {
+                    "999": {
+                        "fineness": 999,
+                        "per_gram": _round(
+                            silver_999
+                        ),
+                        "per_10g": _round(
+                            silver_999 * 10
+                        ),
+                        "per_kg": _round(
+                            silver_999 * 1000
+                        ),
+                    },
+                },
+            },
+
+            "indicative": True,
+
+            "note": (
+                "Indicative INR spot/reference price only. "
+                "Gold purity values are calculated from the "
+                "24K spot reference. Retail jewellery prices "
+                "may include GST, making charges, wastage, "
+                "retailer margins and local market differences."
+            ),
+        }
+
+        # -----------------------------------------------------
+        # UPDATE CACHE
+        # -----------------------------------------------------
+
+        _cache_data = result
+        _cache_time = time.monotonic()
+
+        return result

@@ -220,6 +220,16 @@ class CalculatorCatalog {
       iconColor: Color(0xFF7C3AED),
       backgroundColor: Color(0xFFF3E8FF),
     ),
+    CalculatorItem(
+      id: 'age',
+      title: 'Age Calculator',
+      subtitle: 'Calculate your exact age',
+      category: 'Tools',
+      categoryType: CalculatorCategory.tools,
+      icon: Icons.cake_outlined,
+      iconColor: Color(0xFFDB2777),
+      backgroundColor: Color(0xFFFCE7F3),
+    ),
 
     CalculatorItem(
       id: 'discount',
