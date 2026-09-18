@@ -1,16 +1,11 @@
 from fastapi import FastAPI
 
-from app.routes.metals import router as metals_router
-
 
 app = FastAPI(
     title="Finora Financial API",
     version="1.0.0",
-    description="Free indicative Gold and Silver market rates API.",
+    description="Finora Financial Calculator API.",
 )
-
-
-app.include_router(metals_router)
 
 
 @app.get("/")

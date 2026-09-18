@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../../core/ads/banner_ad_widget.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
@@ -109,6 +110,7 @@ class _EmiScreenState extends State<EmiScreen> {
           ),
         ],
       ),
+
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.all(AppSpacing.lg),
@@ -134,6 +136,9 @@ class _EmiScreenState extends State<EmiScreen> {
           ],
         ),
       ),
+
+      // AdMob banner
+      bottomNavigationBar: const SafeArea(top: false, child: BannerAdWidget()),
     );
   }
 
@@ -212,7 +217,6 @@ class _EmiScreenState extends State<EmiScreen> {
 
           const SizedBox(height: AppSpacing.lg),
 
-          // Loan amount
           TextField(
             controller: _loanAmountController,
             keyboardType: const TextInputType.numberWithOptions(decimal: false),
@@ -299,7 +303,7 @@ class _EmiScreenState extends State<EmiScreen> {
       ),
       child: Column(
         children: [
-          Icon(
+          const Icon(
             Icons.calculate_outlined,
             size: 42,
             color: AppColors.textSecondary,

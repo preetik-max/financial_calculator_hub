@@ -85,6 +85,14 @@ Thank you.
             ),
 
             // ======================================================
+            // GOLD & SILVER
+            // ======================================================
+            SliverPadding(
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+              sliver: SliverToBoxAdapter(child: _buildMetals(context)),
+            ),
+
+            // ======================================================
             // FINANCE BANNER
             // ======================================================
             SliverPadding(
@@ -185,41 +193,89 @@ Thank you.
 
         const SizedBox(height: AppSpacing.md),
 
-        IntrinsicHeight(
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // ------------------------------------------------------
-              // CALCULATORS
-              // ------------------------------------------------------
-              Expanded(
-                child: _ActionCard(
-                  icon: Icons.calculate_rounded,
-                  title: 'Calculators',
-                  subtitle: 'Explore calculators',
-                  onTap: () {
-                    Navigator.pushNamed(context, AppRoutes.calculators);
-                  },
-                ),
+        Row(
+          children: [
+            // ------------------------------------------------------
+            // CALCULATORS
+            // ------------------------------------------------------
+            Expanded(
+              child: _ActionCard(
+                icon: Icons.calculate_rounded,
+                title: 'Calculators',
+                subtitle: 'Explore calculators',
+                onTap: () {
+                  Navigator.pushNamed(context, AppRoutes.calculators);
+                },
               ),
+            ),
 
-              const SizedBox(width: AppSpacing.md),
+            const SizedBox(width: AppSpacing.md),
 
-              // ------------------------------------------------------
-              // FINANCIAL PRODUCTS
-              // ------------------------------------------------------
-              Expanded(
-                child: _ActionCard(
-                  icon: Icons.account_balance_wallet_rounded,
-                  title: 'Financial Products',
-                  subtitle: 'Explore offers',
-                  onTap: () {
-                    Navigator.pushNamed(context, AppRoutes.financialProducts);
-                  },
-                ),
+            // ------------------------------------------------------
+            // FINANCIAL PRODUCTS
+            // ------------------------------------------------------
+            Expanded(
+              child: _ActionCard(
+                icon: Icons.account_balance_wallet_rounded,
+                title: 'Financial Products',
+                subtitle: 'Explore offers',
+                onTap: () {
+                  Navigator.pushNamed(context, AppRoutes.financialProducts);
+                },
               ),
-            ],
-          ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  // ================================================================
+  // GOLD & SILVER
+  // ================================================================
+
+  Widget _buildMetals(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text('Gold & Silver', style: AppTextStyles.sectionTitle),
+
+        const SizedBox(height: AppSpacing.md),
+
+        Row(
+          children: [
+            Expanded(
+              child: _MetalCard(
+                title: 'Gold',
+                price: '₹7,245',
+                unit: '10 grams',
+                change: '+1.14%',
+                icon: Icons.workspace_premium_rounded,
+                iconColor: AppColors.gold,
+                background: AppColors.goldLight,
+                onTap: () {
+                  Navigator.pushNamed(context, AppRoutes.gold);
+                },
+              ),
+            ),
+
+            const SizedBox(width: AppSpacing.md),
+
+            Expanded(
+              child: _MetalCard(
+                title: 'Silver',
+                price: '₹86,420',
+                unit: '1 kilogram',
+                change: '+0.86%',
+                icon: Icons.circle_outlined,
+                iconColor: AppColors.silver,
+                background: AppColors.silverLight,
+                onTap: () {
+                  Navigator.pushNamed(context, AppRoutes.silver);
+                },
+              ),
+            ),
+          ],
         ),
       ],
     );
@@ -414,6 +470,73 @@ class _ActionCard extends StatelessWidget {
               const SizedBox(height: 4),
 
               Text(subtitle, style: AppTextStyles.caption),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ==================================================================
+// METAL CARD
+// ==================================================================
+
+class _MetalCard extends StatelessWidget {
+  final String title;
+  final String price;
+  final String unit;
+  final String change;
+  final IconData icon;
+  final Color iconColor;
+  final Color background;
+  final VoidCallback onTap;
+
+  const _MetalCard({
+    required this.title,
+    required this.price,
+    required this.unit,
+    required this.change,
+    required this.icon,
+    required this.iconColor,
+    required this.background,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: background,
+      borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+        child: Container(
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          decoration: BoxDecoration(
+            color: background,
+            borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Icon(icon, color: iconColor, size: 30),
+
+              const SizedBox(height: AppSpacing.md),
+
+              Text(title, style: AppTextStyles.sectionTitle),
+
+              const SizedBox(height: 5),
+
+              Text(price, style: AppTextStyles.price),
+
+              const SizedBox(height: 3),
+
+              Text('per $unit', style: AppTextStyles.caption),
+
+              const SizedBox(height: AppSpacing.sm),
+
+              Text(change, style: AppTextStyles.positive),
             ],
           ),
         ),

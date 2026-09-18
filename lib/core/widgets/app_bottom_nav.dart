@@ -27,14 +27,14 @@ class AppBottomNav extends StatelessWidget {
           label: 'Calculators',
         ),
         NavigationDestination(
-          icon: Icon(Icons.workspace_premium_outlined),
-          selectedIcon: Icon(Icons.workspace_premium_rounded),
-          label: 'Gold & Silver',
+          icon: Icon(Icons.account_balance_wallet_outlined),
+          selectedIcon: Icon(Icons.account_balance_wallet_rounded),
+          label: 'Products',
         ),
         NavigationDestination(
-          icon: Icon(Icons.person_outline_rounded),
-          selectedIcon: Icon(Icons.person_rounded),
-          label: 'Profile',
+          icon: Icon(Icons.settings_outlined),
+          selectedIcon: Icon(Icons.settings_rounded),
+          label: 'Settings',
         ),
       ],
     );

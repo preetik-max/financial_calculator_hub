@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/ads/banner_ad_widget.dart';
 import 'age_calculator.dart';
 import 'age_model.dart';
 import 'widgets/age_result_card.dart';
@@ -62,6 +63,11 @@ class _AgeScreenState extends State<AgeScreen> {
     setState(() {
       _dateOfBirth = _dateOnly(selected);
       _result = null;
+
+      // Make sure Age At Date is never before DOB.
+      if (_ageAtDate.isBefore(_dateOfBirth)) {
+        _ageAtDate = _dateOfBirth;
+      }
     });
   }
 
@@ -130,6 +136,7 @@ class _AgeScreenState extends State<AgeScreen> {
 
     return Scaffold(
       appBar: AppBar(title: const Text('Age Calculator'), centerTitle: true),
+
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
@@ -178,7 +185,9 @@ class _AgeScreenState extends State<AgeScreen> {
                       ),
                     ),
                   ),
+
                   const SizedBox(width: 10),
+
                   SizedBox(
                     height: 54,
                     width: 54,
@@ -204,10 +213,17 @@ class _AgeScreenState extends State<AgeScreen> {
               const SizedBox(height: 20),
 
               _buildInfoCard(theme),
+
+              // Extra bottom spacing so content does not feel attached
+              // to the AdMob banner.
+              const SizedBox(height: 16),
             ],
           ),
         ),
       ),
+
+      // AdMob banner
+      bottomNavigationBar: const SafeArea(top: false, child: BannerAdWidget()),
     );
   }
 
@@ -230,7 +246,9 @@ class _AgeScreenState extends State<AgeScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Icon(Icons.person_outline, color: Colors.white, size: 36),
+
           SizedBox(height: 12),
+
           Text(
             'Age Calculator',
             style: TextStyle(
@@ -239,7 +257,9 @@ class _AgeScreenState extends State<AgeScreen> {
               fontWeight: FontWeight.w800,
             ),
           ),
+
           SizedBox(height: 6),
+
           Text(
             'Find your exact age in years, months and days.',
             style: TextStyle(color: Colors.white70, fontSize: 14, height: 1.4),
@@ -290,7 +310,9 @@ class _AgeScreenState extends State<AgeScreen> {
                         fontWeight: FontWeight.w700,
                       ),
                     ),
+
                     const SizedBox(height: 3),
+
                     Text(
                       subtitle,
                       style: TextStyle(
@@ -298,7 +320,9 @@ class _AgeScreenState extends State<AgeScreen> {
                         color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
                     ),
+
                     const SizedBox(height: 8),
+
                     Text(
                       _formatDate(date),
                       style: const TextStyle(
@@ -331,14 +355,18 @@ class _AgeScreenState extends State<AgeScreen> {
             Row(
               children: [
                 Icon(Icons.info_outline, color: theme.colorScheme.primary),
+
                 const SizedBox(width: 8),
+
                 const Text(
                   'About Age Calculator',
                   style: TextStyle(fontSize: 17, fontWeight: FontWeight.w800),
                 ),
               ],
             ),
+
             const SizedBox(height: 12),
+
             Text(
               'Calculate your exact age based on your date of '
               'birth and any selected date. The result includes '

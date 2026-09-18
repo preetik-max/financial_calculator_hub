@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import '../core/widgets/app_bottom_nav.dart';
 import '../features/home/screens/home_screen.dart';
 import '../features/calculators/screens/calculators_screen.dart';
-import '../features/metals/screens/metals_screen.dart';
-import '../features/profile/screens/profile_screen.dart';
+import '../features/financial_products/screens/financial_products_screen.dart';
+import '../features/settings/screens/settings_screen.dart';
 
 class AppShell extends StatefulWidget {
   final int initialIndex;
@@ -21,8 +21,8 @@ class _AppShellState extends State<AppShell> {
   static const List<Widget> _pages = [
     HomeScreen(),
     CalculatorsScreen(),
-    MetalsScreen(),
-    ProfileScreen(),
+    FinancialProductsScreen(),
+    SettingsScreen(),
   ];
 
   @override

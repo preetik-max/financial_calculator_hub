@@ -3,6 +3,7 @@ import '../../calculator_modules/lumpsum/lumpsum_screen.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_text_styles.dart';
+import '../../../core/lead/lead_contact_button.dart';
 import '../../calculator_modules/cagr/cagr_screen.dart';
 import '../../calculator_modules/loan_eligibility/loan_eligibility_screen.dart';
 import '../../calculator_modules/salary/salary_screen.dart';
@@ -13,6 +14,7 @@ import '../data/calculator_catalog.dart';
 import '../widgets/calculator_category_tabs.dart';
 import '../widgets/calculator_list_item.dart';
 import '../widgets/calculator_search.dart';
+import '../../calculator_modules/personal_loan/personal_loan_screen.dart';
 import '../../calculator_modules/home_loan/home_loan_screen.dart';
 import '../../calculator_modules/fd/fd_screen.dart';
 import '../../calculator_modules/rd/rd_screen.dart';
@@ -33,6 +35,31 @@ class CalculatorsScreen extends StatefulWidget {
 
 class _CalculatorsScreenState extends State<CalculatorsScreen> {
   final TextEditingController _searchController = TextEditingController();
+
+  // ================================================================
+  // WHATSAPP LEAD MESSAGE
+  // ================================================================
+
+  String _whatsappMessage() {
+    return '''
+Hello, I need help with financial planning.
+
+I am using the Finora Financial Calculator app.
+
+I would like guidance about:
+
+• Loans
+• EMI
+• Investments
+• Mutual Funds
+• Insurance
+• Financial Planning
+
+Please guide me regarding suitable financial products.
+
+Thank you.
+''';
+  }
 
   CalculatorCategory _selectedCategory = CalculatorCategory.all;
 
@@ -74,111 +101,131 @@ class _CalculatorsScreenState extends State<CalculatorsScreen> {
   Widget build(BuildContext context) {
     final calculators = _calculators;
 
-    return SafeArea(
-      child: CustomScrollView(
-        slivers: [
-          // ============================================================
-          // HEADER
-          // ============================================================
-          SliverPadding(
-            padding: const EdgeInsets.fromLTRB(
-              AppSpacing.lg,
-              AppSpacing.lg,
-              AppSpacing.lg,
-              0,
-            ),
-            sliver: SliverToBoxAdapter(child: _header()),
-          ),
+    return Scaffold(
+      // ============================================================
+      // WHATSAPP LEAD BUTTON
+      // ============================================================
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
 
-          // ============================================================
-          // SEARCH
-          // ============================================================
-          SliverPadding(
-            padding: const EdgeInsets.fromLTRB(
-              AppSpacing.lg,
-              AppSpacing.xl,
-              AppSpacing.lg,
-              0,
+      floatingActionButton: LeadContactButton(
+        message: _whatsappMessage(),
+        tooltip: 'Chat with Financial Advisor',
+        onError: () {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Unable to open WhatsApp. Please try again.'),
+              behavior: SnackBarBehavior.floating,
             ),
-            sliver: SliverToBoxAdapter(
-              child: CalculatorSearch(
-                controller: _searchController,
-                onChanged: (value) {
-                  setState(() {
-                    _searchQuery = value.trim();
-                  });
-                },
+          );
+        },
+      ),
+
+      body: SafeArea(
+        child: CustomScrollView(
+          slivers: [
+            // ============================================================
+            // HEADER
+            // ============================================================
+            SliverPadding(
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.lg,
+                AppSpacing.lg,
+                AppSpacing.lg,
+                0,
               ),
+              sliver: SliverToBoxAdapter(child: _header()),
             ),
-          ),
 
-          // ============================================================
-          // CATEGORY TABS
-          // ============================================================
-          SliverPadding(
-            padding: const EdgeInsets.fromLTRB(
-              AppSpacing.lg,
-              AppSpacing.md,
-              AppSpacing.lg,
-              0,
-            ),
-            sliver: SliverToBoxAdapter(
-              child: CalculatorCategoryTabs(
-                selectedCategory: _selectedCategory,
-                onChanged: (category) {
-                  setState(() {
-                    _selectedCategory = category;
-                  });
-                },
-              ),
-            ),
-          ),
-
-          // ============================================================
-          // POPULAR CALCULATORS
-          // ============================================================
-          if (_showingPopular)
+            // ============================================================
+            // SEARCH
+            // ============================================================
             SliverPadding(
               padding: const EdgeInsets.fromLTRB(
                 AppSpacing.lg,
                 AppSpacing.xl,
                 AppSpacing.lg,
-                AppSpacing.md,
+                0,
               ),
-              sliver: SliverToBoxAdapter(child: _popularSection()),
+              sliver: SliverToBoxAdapter(
+                child: CalculatorSearch(
+                  controller: _searchController,
+                  onChanged: (value) {
+                    setState(() {
+                      _searchQuery = value.trim();
+                    });
+                  },
+                ),
+              ),
             ),
 
-          // ============================================================
-          // CALCULATOR LIST
-          // ============================================================
-          SliverPadding(
-            padding: EdgeInsets.fromLTRB(
-              AppSpacing.lg,
-              _showingPopular ? 0 : AppSpacing.xl,
-              AppSpacing.lg,
-              AppSpacing.xxl,
+            // ============================================================
+            // CATEGORY TABS
+            // ============================================================
+            SliverPadding(
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.lg,
+                AppSpacing.md,
+                AppSpacing.lg,
+                0,
+              ),
+              sliver: SliverToBoxAdapter(
+                child: CalculatorCategoryTabs(
+                  selectedCategory: _selectedCategory,
+                  onChanged: (category) {
+                    setState(() {
+                      _selectedCategory = category;
+                    });
+                  },
+                ),
+              ),
             ),
-            sliver: calculators.isEmpty
-                ? SliverToBoxAdapter(child: _emptyState())
-                : SliverList.builder(
-                    itemCount: calculators.length,
-                    itemBuilder: (context, index) {
-                      final calculator = calculators[index];
 
-                      return CalculatorListItem(
-                        calculator: calculator,
-                        isFavorite: _favorites.contains(calculator.id),
-                        onFavoriteTap: () {
-                          _toggleFavorite(calculator.id);
-                        },
-                        onTap: () {
-                          _openCalculator(context, calculator);
-                        },
-                      );
-                    },
-                  ),
-          ),
-        ],
+            // ============================================================
+            // POPULAR CALCULATORS
+            // ============================================================
+            if (_showingPopular)
+              SliverPadding(
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.lg,
+                  AppSpacing.xl,
+                  AppSpacing.lg,
+                  AppSpacing.md,
+                ),
+                sliver: SliverToBoxAdapter(child: _popularSection()),
+              ),
+
+            // ============================================================
+            // CALCULATOR LIST
+            // ============================================================
+            SliverPadding(
+              padding: EdgeInsets.fromLTRB(
+                AppSpacing.lg,
+                _showingPopular ? 0 : AppSpacing.xl,
+                AppSpacing.lg,
+                AppSpacing.xxl,
+              ),
+              sliver: calculators.isEmpty
+                  ? SliverToBoxAdapter(child: _emptyState())
+                  : SliverList.builder(
+                      itemCount: calculators.length,
+                      itemBuilder: (context, index) {
+                        final calculator = calculators[index];
+
+                        return CalculatorListItem(
+                          calculator: calculator,
+                          isFavorite: _favorites.contains(calculator.id),
+                          onFavoriteTap: () {
+                            _toggleFavorite(calculator.id);
+                          },
+                          onTap: () {
+                            _openCalculator(context, calculator);
+                          },
+                        );
+                      },
+                    ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -416,6 +463,12 @@ class _CalculatorsScreenState extends State<CalculatorsScreen> {
         Navigator.push(
           context,
           MaterialPageRoute(builder: (_) => const HomeLoanScreen()),
+        );
+        break;
+      case 'personal_loan':
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const PersonalLoanScreen()),
         );
         break;
 

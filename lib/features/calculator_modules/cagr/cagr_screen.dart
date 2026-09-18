@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../../core/ads/banner_ad_widget.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
@@ -32,7 +33,6 @@ class _CagrScreenState extends State<CagrScreen> {
   @override
   void initState() {
     super.initState();
-
     _calculate();
   }
 
@@ -41,7 +41,6 @@ class _CagrScreenState extends State<CagrScreen> {
     _initialController.dispose();
     _finalController.dispose();
     _yearsController.dispose();
-
     super.dispose();
   }
 
@@ -121,9 +120,14 @@ class _CagrScreenState extends State<CagrScreen> {
             if (_result != null) CagrResultCard(result: _result!),
 
             if (_result == null) _buildValidationMessage(),
+
+            const SizedBox(height: AppSpacing.xl),
           ],
         ),
       ),
+
+      // AdMob banner
+      bottomNavigationBar: const SafeArea(top: false, child: BannerAdWidget()),
     );
   }
 

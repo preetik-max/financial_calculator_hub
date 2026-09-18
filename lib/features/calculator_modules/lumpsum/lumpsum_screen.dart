@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../../core/ads/banner_ad_widget.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
@@ -30,7 +31,6 @@ class _LumpsumScreenState extends State<LumpsumScreen> {
   @override
   void initState() {
     super.initState();
-
     _calculate();
   }
 
@@ -43,13 +43,11 @@ class _LumpsumScreenState extends State<LumpsumScreen> {
 
   double _parseNumber(String value) {
     final cleaned = value.replaceAll(',', '').replaceAll('₹', '').trim();
-
     return double.tryParse(cleaned) ?? 0;
   }
 
   void _calculate() {
     final double investment = _parseNumber(_investmentController.text);
-
     final double annualReturn = _parseNumber(_returnController.text);
 
     final result = LumpsumCalculator.calculate(
@@ -72,12 +70,19 @@ class _LumpsumScreenState extends State<LumpsumScreen> {
       appBar: AppBar(
         backgroundColor: AppColors.background,
         elevation: 0,
+        scrolledUnderElevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_rounded),
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text('Lumpsum Calculator'),
       ),
+
+      // ============================================================
+      // ADMOB BANNER
+      // ============================================================
+      bottomNavigationBar: const SafeArea(top: false, child: BannerAdWidget()),
+
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.all(AppSpacing.lg),
@@ -91,6 +96,8 @@ class _LumpsumScreenState extends State<LumpsumScreen> {
             const SizedBox(height: AppSpacing.xl),
 
             _disclaimer(),
+
+            const SizedBox(height: AppSpacing.lg),
           ],
         ),
       ),

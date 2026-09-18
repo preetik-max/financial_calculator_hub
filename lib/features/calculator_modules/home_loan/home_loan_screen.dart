@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../../core/ads/banner_ad_widget.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
@@ -33,7 +34,6 @@ class _HomeLoanScreenState extends State<HomeLoanScreen> {
   @override
   void initState() {
     super.initState();
-
     _calculate();
   }
 
@@ -42,7 +42,6 @@ class _HomeLoanScreenState extends State<HomeLoanScreen> {
     _loanAmountController.dispose();
     _interestRateController.dispose();
     _tenureController.dispose();
-
     super.dispose();
   }
 
@@ -56,16 +55,13 @@ class _HomeLoanScreenState extends State<HomeLoanScreen> {
 
   void _calculate() {
     final double loanAmount = _parseDouble(_loanAmountController.text);
-
     final double interestRate = _parseDouble(_interestRateController.text);
-
     final int tenure = _parseInt(_tenureController.text);
 
     if (loanAmount <= 0 || interestRate < 0 || tenure <= 0) {
       setState(() {
         _result = null;
       });
-
       return;
     }
 
@@ -128,6 +124,7 @@ class _HomeLoanScreenState extends State<HomeLoanScreen> {
         title: const Text('Home Loan Calculator'),
         centerTitle: true,
       ),
+
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.all(AppSpacing.lg),
@@ -150,7 +147,6 @@ class _HomeLoanScreenState extends State<HomeLoanScreen> {
 
             if (_result != null) ...[
               const SizedBox(height: AppSpacing.xxl),
-
               HomeLoanResultCard(result: _result!),
             ],
 
@@ -162,6 +158,9 @@ class _HomeLoanScreenState extends State<HomeLoanScreen> {
           ],
         ),
       ),
+
+      // AdMob banner
+      bottomNavigationBar: const SafeArea(top: false, child: BannerAdWidget()),
     );
   }
 
