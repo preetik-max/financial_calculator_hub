@@ -33,3 +33,4 @@ ios/Flutter/flutter_export_environment.sh
 # Logs
 *.log
 .flutter-plugins-dependencies
+android/key.properties

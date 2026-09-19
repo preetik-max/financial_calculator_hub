@@ -24,7 +24,11 @@ dependencies:
 
   # Number, currency and date formatting
   intl: ^0.20.2
+
+  # HTTP/API requests
   http: ^1.6.0
+
+  # Open external URLs / affiliate links
   url_launcher: ^6.3.2
 
 dev_dependencies:
@@ -39,14 +43,63 @@ dev_dependencies:
 flutter:
   uses-material-design: true
 
-  # App assets
+  # ============================================================
+  # APP ASSETS
+  # ============================================================
   assets:
+
+    # ----------------------------------------------------------
+    # App icon
+    # ----------------------------------------------------------
     - assets/icon/app_icon.png
 
-# App launcher icon configuration
+    # ----------------------------------------------------------
+    # Credit card bank logos / card images
+    # Existing general cards
+    # ----------------------------------------------------------
+    - assets/images/cards/
+
+    # Axis Bank Credit Cards
+    # ----------------------------------------------------------
+    - assets/cards/axis/
+    - assets/cards/sbi/
+    - assets/cards/hdfc/
+
+    # ----------------------------------------------------------
+    # Personal loan bank logos
+    # ----------------------------------------------------------
+    - assets/images/loans/
+
+    # ----------------------------------------------------------
+    # Home loan bank logos
+    # ----------------------------------------------------------
+    - assets/images/home_loans/
+
+    # ----------------------------------------------------------
+    # Car loan bank logos
+    # ----------------------------------------------------------
+    - assets/images/car_loans/
+
+    # ----------------------------------------------------------
+    # Insurance provider logos
+    # ----------------------------------------------------------
+    - assets/images/insurance/
+
+    # ----------------------------------------------------------
+    # Fixed deposit bank logos
+    # ----------------------------------------------------------
+    - assets/images/fixed_deposits/
+
+
+# ==============================================================
+# APP LAUNCHER ICON CONFIGURATION
+# ==============================================================
+
 flutter_launcher_icons:
   android: true
   ios: true
+
   image_path: "assets/icon/app_icon.png"
+
   adaptive_icon_background: "#0D47A1"
   adaptive_icon_foreground: "assets/icon/app_icon.png"
