@@ -1,0 +1,187 @@
+import 'package:flutter/material.dart';
+
+class PdfToolsScreen extends StatelessWidget {
+  const PdfToolsScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final tools = [
+      _PdfTool(
+        title: 'JPG to PDF',
+        description: 'Convert images into PDF',
+        icon: Icons.image_outlined,
+      ),
+      _PdfTool(
+        title: 'Merge PDF',
+        description: 'Combine multiple PDFs',
+        icon: Icons.merge_type,
+      ),
+      _PdfTool(
+        title: 'Split PDF',
+        description: 'Split PDF into separate files',
+        icon: Icons.call_split_outlined,
+      ),
+      _PdfTool(
+        title: 'Compress PDF',
+        description: 'Reduce PDF file size',
+        icon: Icons.compress_outlined,
+      ),
+      _PdfTool(
+        title: 'PDF Sign',
+        description: 'Add your signature to PDF',
+        icon: Icons.draw_outlined,
+      ),
+      _PdfTool(
+        title: 'Unlock PDF',
+        description: 'Remove PDF password protection',
+        icon: Icons.lock_open_outlined,
+      ),
+      _PdfTool(
+        title: 'PDF to JPG',
+        description: 'Convert PDF pages to images',
+        icon: Icons.picture_as_pdf_outlined,
+      ),
+    ];
+
+    return Scaffold(
+      appBar: AppBar(title: const Text('PDF Tools')),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.primaryContainer,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.picture_as_pdf_rounded,
+                  size: 42,
+                  color: Theme.of(context).colorScheme.onPrimaryContainer,
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'PDF Tools',
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Simple tools for managing your PDF files.',
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 20),
+
+          GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: tools.length,
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 12,
+              mainAxisSpacing: 12,
+              childAspectRatio: 0.95,
+            ),
+            itemBuilder: (context, index) {
+              final tool = tools[index];
+
+              return Card(
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(12),
+                  onTap: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('${tool.title} is coming soon.')),
+                    );
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          height: 48,
+                          width: 48,
+                          decoration: BoxDecoration(
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.primaryContainer,
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          child: Icon(
+                            tool.icon,
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                        ),
+
+                        const Spacer(),
+
+                        Text(
+                          tool.title,
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(fontWeight: FontWeight.bold),
+                        ),
+
+                        const SizedBox(height: 5),
+
+                        Text(
+                          tool.description,
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
+
+                        const SizedBox(height: 10),
+
+                        Row(
+                          children: [
+                            Text(
+                              'Open',
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.primary,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            const SizedBox(width: 4),
+                            Icon(
+                              Icons.arrow_forward_rounded,
+                              size: 16,
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _PdfTool {
+  final String title;
+  final String description;
+  final IconData icon;
+
+  const _PdfTool({
+    required this.title,
+    required this.description,
+    required this.icon,
+  });
+}

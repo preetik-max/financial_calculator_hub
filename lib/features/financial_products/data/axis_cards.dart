@@ -20,7 +20,8 @@ const List<AxisCardOffer> axisCards = [
     image: 'assets/cards/axis/flipkart_axis.png',
     applyUrl: 'https://linkzip.in/ubdp5n',
     badge: 'FYF Offer',
-    description: 'Earn rewards and enjoy benefits on Flipkart and partner purchases.',
+    description:
+        'Earn rewards and enjoy benefits on Flipkart and partner purchases.',
   ),
 
   AxisCardOffer(
@@ -50,7 +51,8 @@ const List<AxisCardOffer> axisCards = [
     name: 'Airtel Axis Bank Credit Card',
     image: 'assets/cards/axis/airtel_axis.png',
     applyUrl: 'https://linkzip.in/01bg6x',
-    description: 'Credit card with benefits across Airtel and everyday spending.',
+    description:
+        'Credit card with benefits across Airtel and everyday spending.',
   ),
 
   AxisCardOffer(
@@ -65,7 +67,8 @@ const List<AxisCardOffer> axisCards = [
     name: 'Axis My Zone Credit Card',
     image: 'assets/cards/axis/axis_my_zone.png',
     applyUrl: 'https://linkzip.in/r45zuj',
-    description: 'Lifestyle credit card for shopping, dining and entertainment.',
+    description:
+        'Lifestyle credit card for shopping, dining and entertainment.',
   ),
 
   AxisCardOffer(

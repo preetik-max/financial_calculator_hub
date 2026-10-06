@@ -5,6 +5,7 @@ import '../../../core/ads/banner_ad_widget.dart';
 import '../../../core/lead/lead_contact_button.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
+import '../../../core/theme/app_text_styles.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -133,53 +134,39 @@ Thank you.
   // ================================================================
 
   Widget _buildHeader(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
     return Row(
       children: [
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
+              const Text(
                 'Financial Calculator Hub',
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  color: colorScheme.onSurface,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: -0.5,
-                ),
+                style: AppTextStyles.title,
               ),
-
               const SizedBox(height: 4),
-
               Text(
                 'Plan smarter. Calculate better.',
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                  fontWeight: FontWeight.w500,
-                ),
+                style: AppTextStyles.body,
               ),
             ],
           ),
         ),
 
         Container(
-          width: 48,
-          height: 48,
+          width: 44,
+          height: 44,
           decoration: BoxDecoration(
-            color: colorScheme.surface,
+            color: AppColors.surface,
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: colorScheme.outlineVariant),
+            border: Border.all(color: AppColors.border),
           ),
           child: IconButton(
             tooltip: 'Profile',
             onPressed: () {
               Navigator.pushNamed(context, AppRoutes.profile);
             },
-            icon: Icon(
-              Icons.person_outline_rounded,
-              color: colorScheme.onSurfaceVariant,
-            ),
+            icon: const Icon(Icons.person_outline_rounded),
           ),
         ),
       ],
@@ -194,22 +181,17 @@ Thank you.
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Quick Actions',
-          style: Theme.of(
-            context,
-          ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800),
-        ),
+        const Text('Quick Actions', style: AppTextStyles.sectionTitle),
 
         const SizedBox(height: AppSpacing.md),
 
-        // ----------------------------------------------------------
-        // CALCULATORS + FINANCIAL PRODUCTS
-        // ----------------------------------------------------------
         IntrinsicHeight(
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              // ------------------------------------------------------
+              // CALCULATORS
+              // ------------------------------------------------------
               Expanded(
                 child: _ActionCard(
                   icon: Icons.calculate_rounded,
@@ -223,6 +205,9 @@ Thank you.
 
               const SizedBox(width: AppSpacing.md),
 
+              // ------------------------------------------------------
+              // FINANCIAL PRODUCTS
+              // ------------------------------------------------------
               Expanded(
                 child: _ActionCard(
                   icon: Icons.account_balance_wallet_rounded,
@@ -235,17 +220,6 @@ Thank you.
               ),
             ],
           ),
-        ),
-
-        const SizedBox(height: AppSpacing.md),
-
-        // ----------------------------------------------------------
-        // PDF TOOLS
-        // ----------------------------------------------------------
-        _PdfActionCard(
-          onTap: () {
-            Navigator.pushNamed(context, AppRoutes.pdfTools);
-          },
         ),
       ],
     );
@@ -326,12 +300,7 @@ Thank you.
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Explore Calculators',
-          style: Theme.of(
-            context,
-          ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
-        ),
+        const Text('Explore Calculators', style: AppTextStyles.sectionTitle),
 
         const SizedBox(height: AppSpacing.md),
 
@@ -394,7 +363,7 @@ Thank you.
 }
 
 // ==================================================================
-// QUICK ACTION CARD
+// ACTION CARD
 // ==================================================================
 
 class _ActionCard extends StatelessWidget {
@@ -412,145 +381,39 @@ class _ActionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
     return Material(
-      color: colorScheme.surface,
+      color: AppColors.surface,
       borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
         child: Container(
-          constraints: const BoxConstraints(minHeight: 190),
           padding: const EdgeInsets.all(AppSpacing.lg),
           decoration: BoxDecoration(
-            color: colorScheme.surface,
+            color: AppColors.surface,
             borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-            border: Border.all(color: colorScheme.outlineVariant),
+            border: Border.all(color: AppColors.border),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                width: 52,
-                height: 52,
+                width: 48,
+                height: 48,
                 decoration: BoxDecoration(
-                  color: colorScheme.primary.withValues(alpha: 0.10),
-                  borderRadius: BorderRadius.circular(16),
+                  color: AppColors.primary.withValues(alpha: 0.10),
+                  borderRadius: BorderRadius.circular(14),
                 ),
-                child: Icon(icon, color: colorScheme.primary, size: 27),
+                child: Icon(icon, color: AppColors.primary, size: 25),
               ),
 
               const SizedBox(height: AppSpacing.md),
 
-              Text(
-                title,
-                style: Theme.of(
-                  context,
-                ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
-              ),
+              Text(title, style: AppTextStyles.sectionTitle),
 
               const SizedBox(height: 4),
 
-              Text(
-                subtitle,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// ==================================================================
-// PDF ACTION CARD
-// ==================================================================
-
-class _PdfActionCard extends StatelessWidget {
-  final VoidCallback onTap;
-
-  const _PdfActionCard({required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
-    return Material(
-      color: colorScheme.surface,
-      borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-        child: Container(
-          padding: const EdgeInsets.all(AppSpacing.lg),
-          decoration: BoxDecoration(
-            color: colorScheme.surface,
-            borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-            border: Border.all(color: colorScheme.outlineVariant),
-          ),
-          child: Row(
-            children: [
-              Container(
-                width: 56,
-                height: 56,
-                decoration: BoxDecoration(
-                  color: colorScheme.primary.withValues(alpha: 0.10),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Icon(
-                  Icons.picture_as_pdf_rounded,
-                  color: colorScheme.primary,
-                  size: 29,
-                ),
-              ),
-
-              const SizedBox(width: AppSpacing.md),
-
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'PDF Tools',
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-
-                    const SizedBox(height: 4),
-
-                    Text(
-                      'Convert, merge, split and manage PDF files',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-
-                    const SizedBox(height: 8),
-
-                    Text(
-                      'Explore PDF Tools',
-                      style: TextStyle(
-                        color: colorScheme.primary,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(width: 8),
-
-              Icon(
-                Icons.arrow_forward_ios_rounded,
-                size: 18,
-                color: colorScheme.onSurfaceVariant,
-              ),
+              Text(subtitle, style: AppTextStyles.caption),
             ],
           ),
         ),
@@ -576,10 +439,8 @@ class _CalculatorChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
     return Material(
-      color: colorScheme.surface,
+      color: AppColors.surface,
       borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
       child: InkWell(
         onTap: onTap,
@@ -590,21 +451,21 @@ class _CalculatorChip extends StatelessWidget {
             vertical: AppSpacing.md,
           ),
           decoration: BoxDecoration(
-            color: colorScheme.surface,
+            color: AppColors.surface,
             borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-            border: Border.all(color: colorScheme.outlineVariant),
+            border: Border.all(color: AppColors.border),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(icon, size: 18, color: colorScheme.primary),
+              Icon(icon, size: 18, color: AppColors.primary),
 
               const SizedBox(width: 7),
 
               Text(
                 label,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: colorScheme.onSurface,
+                style: AppTextStyles.body.copyWith(
+                  color: AppColors.textPrimary,
                   fontWeight: FontWeight.w600,
                 ),
               ),
